@@ -21,3 +21,5 @@ Customizable:
 - it should be easy to add new digimon/pets/evolution lines
 - it should be easy to change game mechanics and the UI
 
+# How to install
+Just Clone the Repo into VSCode/PlatformIO and flash it to your ESP/Arduino. Don't forget to configure your TFT_eSPI library properly (uncommenting/commenting the right line user_setup_select.h). If you want to use Arduino IDE: the content of main.cpp is equal to arduinos *.ino files
