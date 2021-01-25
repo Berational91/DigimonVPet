@@ -182,8 +182,9 @@ void VPetLCD::drawScaledGrid(uint16_t resolutionX, uint16_t resolutionY) {
     {
       canvas->drawFastVLine(lcdX+currentX*lcdScale, lcdY , resolutionY*(lcdScale),backgroundColor);
     }*/
-}
 
+}
+   
 
 /**
  * Draws the sprite of the Digimon to the simulated LCD
@@ -495,9 +496,9 @@ void VPetLCD::drawSmallIntegerOnLCD(int16_t integer, int16_t onLcdX, int16_t onL
  * This method has to be called in every method that renders something to the TFT_eSprite canvas attribute bevor drawing something
  */
 void VPetLCD::startRendering() {
-  canvas->createSprite(240, 135);
+  canvas->createCanvas(240, 135);
   canvas->setColorDepth(16);
-  canvas->fillSprite(backgroundColor);
+  canvas->fillCanvas(backgroundColor);
   drawScaledGrid(lcdWidth, lcdHeight);
 
 }
@@ -510,9 +511,9 @@ void VPetLCD::endRendering() {
   drawMenu();
   // Push sprite to TFT screen CGRAM at coordinate x,y (top left corner)
   // Specify what colour is to be treated as transparent (black in this example)
-  canvas->pushSprite( 0, 0, transparencyColor);
+  canvas->pushCanvas( 0, 0, transparencyColor);
   // Delete Sprite to free memory, creating and deleting takes very little time.
-  canvas->deleteSprite();
+  canvas->deleteCanvas();
 }
 
 
@@ -525,10 +526,10 @@ void VPetLCD::endRendering() {
    @param lcdWidth determines the width in Pixels of the virtual VPET-LCD (32  for VPet 20th)
    @param lcdHeight determines the width in Pixels of the virtual VPET-LCD (16  for VPet 20th)
 */
-VPetLCD::VPetLCD(TFT_eSprite *eSprite, int lcdWidth, int lcdHeight)
+VPetLCD::VPetLCD(AbstractDisplayAdapter *displayAdapter, int lcdWidth, int lcdHeight)
 {
 
-  this->canvas = eSprite;
+  this->canvas = displayAdapter;
   this->lcdHeight = lcdHeight;
   this->lcdWidth = lcdWidth;
   setSymbols(SYMBOLS);

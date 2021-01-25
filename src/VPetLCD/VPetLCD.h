@@ -13,6 +13,7 @@
 #include <TFT_eSPI.h>
 #include "LettersAndDigits.h"
 #include "Screens/SymbolData.h"
+#include "DisplayAdapter/AbstractDisplayadapter.h"
 
 
 #define SPRITES_DIGIMON_RESOLUTION 16
@@ -23,7 +24,7 @@ class VPetLCD {
 
   private:
 
-    TFT_eSprite *canvas;
+    AbstractDisplayAdapter *canvas;
     unsigned int menuItemSprites[N_SPRITES_MENU][SPRITES_MENU_RESOLUTION];
     byte symbols[N_SPRITES_SYMBOL][SPRITES_SYMBOL_RESOLUTION];
 
@@ -75,7 +76,7 @@ class VPetLCD {
 
     
     //Constructor
-    VPetLCD(TFT_eSprite *eSprite, int lcdWidth, int lcdHeight);
+    VPetLCD(AbstractDisplayAdapter *displayAdapter, int lcdWidth, int lcdHeight);
 
     //sets the Position of the virtual LCD on the screen
     void setLCDPos(int x, int y){lcdX=x;lcdY=y; }

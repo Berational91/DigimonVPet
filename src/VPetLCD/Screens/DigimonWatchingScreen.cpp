@@ -45,16 +45,24 @@ void V20::DigimonWatchingScreen::randomMoveDigimon(){
 
     if(randomDecision(probabilityMoveVertical)){
         if(looksUp){
-            digimonY++;
+            if( digimonY<maxY-1){
+                digimonY++;
+            }
         }else{
-            digimonY--;
+            if( digimonY>minY+1){
+                digimonY--;
+            }
         }
     }
 
     if (looksLeft) {
-      digimonX--;
+        if( digimonX>minX+1){
+            digimonX--;
+        }
     } else {
-      digimonX++;
+      if( digimonX<maxX-1){
+            digimonX++;
+        }
     }
 
     //with probability of 5% make some other moves

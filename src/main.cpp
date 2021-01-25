@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////
 /*
   main.cpp - main programm to test the VPetLCD Class and the 
-  screen classes 
+  screen classes. This is the *.ino file from the arduino ide
   Created by Berat Özdemir, January 16 , 2021.
 */
 /////////////////////////////////////////////////////////////////
@@ -17,6 +17,8 @@
 #include "VPetLCD/Screens/ClockScreen.h"
 #include "VPetLCD/Screens/DigimonWatchingScreen.h"
 
+#include "VPetLCD/DisplayAdapter/TFT_eSPI_Displayadapter.h"
+
 #include <TFT_eSPI.h>
 #include "Button2.h"
 
@@ -27,6 +29,7 @@ int displayHeight = 240;
 TFT_eSPI    tft = TFT_eSPI(displayWidth, displayHeight);        // Create object "tft"
 TFT_eSprite img = TFT_eSprite(&tft);// Create Sprite object "img" with pointer to "tft" object
 
+TFT_eSPI_DisplayAdapter displayAdapter(&img);
 
 #define BITS_PER_PIXEL 1              // How many bits per pixel in Sprite
 
@@ -44,7 +47,7 @@ Button2 btn2(BUTTON_2);
 boolean fpslock(long delta);
 boolean randomDecision(int percent);
 
-boolean debug = true;
+boolean debug = false;
 int ax = 5;
 int ay = 0;
 
@@ -64,7 +67,7 @@ int seconds = 0;
 
 boolean buttonPressed = false;
 
-VPetLCD screen(&img, 48, 24);
+VPetLCD screen(&displayAdapter, 40, 16);
 V20::DigimonNameScreen digiNameScreen("Agumon",DIGIMON_AGUMON, 24);
 V20::AgeWeightScreen ageWeightScreen(5,21);
 V20::HeartsScreen hungryScreen("Hungry", 2, 4);
@@ -76,7 +79,7 @@ V20::PercentageScreen tPercentageScreen("WIN",'T',93);
 V20::SelectionScreen foodSelection(true);
 V20::SelectionScreen fightSelection(true);
 V20::ClockScreen clockScreen(true);
-V20::DigimonWatchingScreen digimonScreen(DIGIMON_AGUMON, -8, 40, 0, 16);
+V20::DigimonWatchingScreen digimonScreen(DIGIMON_AGUMON, -8, 40, 0, 0);
 
 void button_init()
 {
@@ -93,6 +96,13 @@ void button_init()
       screen.setSelectedMenuItemIndex(selection);
   
       buttonPressed = true;
+    }else{
+      subSelection++;
+      if (subSelection >= maxSubmenues[selection]) {
+        subSelection = 0;
+        //currentScreen = -1;
+      }
+      buttonPressed = true;
     }
   });
 
@@ -102,11 +112,7 @@ void button_init()
       currentScreen = selection;
       subSelection = 0;
     } else {
-      subSelection++;
-      if (subSelection >= maxSubmenues[selection]) {
-        subSelection = 0;
-        //currentScreen = -1;
-      }
+      
     }
 
 
@@ -116,11 +122,11 @@ void button_init()
 
 void setupScreens(){
   screen.setSelectedMenuItemIndex(selection);
-  screen.setLCDPos(24,32);
-  screen.setLcdScale(4);
+  screen.setLCDPos(0,32);
+  screen.setLcdScale(6);
 
   //Positioning of the screens
-  int screensOffsetX =0;
+  int screensOffsetX =4;
 
   ageWeightScreen.setPos(screensOffsetX,0);
   effortScreen.setPos(screensOffsetX,0);
