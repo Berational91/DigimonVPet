@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////
 /*
-  main.cpp - main programm to test the VPetLCD Class and the 
-  screen classes. This is the *.ino file from the arduino ide
+  main.cpp - main programm to test the VPetLCD Class and the
+  screen classes. JUST FOR TESTING PURPOSES This is the *.ino file
+  from the arduino ide
   Created by Berat Özdemir, January 16 , 2021.
 */
 /////////////////////////////////////////////////////////////////
-
 
 #include "VPetLCD/VPetLCD.h"
 #include "VPetLCD/Screens/AgeWeightScreen.h"
@@ -22,60 +22,46 @@
 #include <TFT_eSPI.h>
 #include "Button2.h"
 
-
 int displayWidth = 135;
 int displayHeight = 240;
 
-TFT_eSPI    tft = TFT_eSPI(displayWidth, displayHeight);        // Create object "tft"
-TFT_eSprite img = TFT_eSprite(&tft);// Create Sprite object "img" with pointer to "tft" object
+TFT_eSPI tft = TFT_eSPI(displayWidth, displayHeight); // Create object "tft"
+TFT_eSprite img = TFT_eSprite(&tft);                  // Create Sprite object "img" with pointer to "tft" object
+TFT_eSPI_DisplayAdapter displayAdapter(&img);         //create a DisplayAdapter for VPetLCD class
 
-TFT_eSPI_DisplayAdapter displayAdapter(&img);
-
-#define BITS_PER_PIXEL 1              // How many bits per pixel in Sprite
-
-#define PIXELSCALE 6
-
-#define ADC_EN              14  //ADC_EN is the ADC detection enable port
-#define ADC_PIN             34
-#define BUTTON_1            35
-#define BUTTON_2            0
+#define ADC_EN 14 //ADC_EN is the ADC detection enable port
+#define ADC_PIN 34
+#define BUTTON_1 35
+#define BUTTON_2 0
 
 Button2 btn1(BUTTON_1);
 Button2 btn2(BUTTON_2);
 
-
+//method for being fps independent
 boolean fpslock(long delta);
-boolean randomDecision(int percent);
 
 boolean debug = false;
-int ax = 5;
-int ay = 0;
 
-boolean goleft = true;
-
-int n_sprites = 2;
-int currentSprite = 0;
 int selection = 0;
 int currentScreen = -1;
 int subSelection = 0;
-int maxSubmenues[] = {8, 4, 0, 2, 0};
+int maxSubmenues[] = { 8, 4, 0, 2, 0 };
 
 int hours = 23;
 int minutes = 59;
 int seconds = 0;
 
-
 boolean buttonPressed = false;
 
 VPetLCD screen(&displayAdapter, 40, 16);
-V20::DigimonNameScreen digiNameScreen("Agumon",DIGIMON_AGUMON, 24);
-V20::AgeWeightScreen ageWeightScreen(5,21);
+V20::DigimonNameScreen digiNameScreen("Agumon", DIGIMON_AGUMON, 24);
+V20::AgeWeightScreen ageWeightScreen(5, 21);
 V20::HeartsScreen hungryScreen("Hungry", 2, 4);
 V20::HeartsScreen strengthScreen("Strength", 3, 4);
 V20::HeartsScreen effortScreen("Effort", 4, 4);
 V20::ProgressBarScreen dpScreen("DP", 29, 40);
-V20::PercentageScreen sPercentageScreen("WIN",'S',100);
-V20::PercentageScreen tPercentageScreen("WIN",'T',93);
+V20::PercentageScreen sPercentageScreen("WIN", 'S', 100);
+V20::PercentageScreen tPercentageScreen("WIN", 'T', 93);
 V20::SelectionScreen foodSelection(true);
 V20::SelectionScreen fightSelection(true);
 V20::ClockScreen clockScreen(true);
@@ -83,59 +69,63 @@ V20::DigimonWatchingScreen digimonScreen(DIGIMON_AGUMON, -8, 40, 0, 0);
 
 void button_init()
 {
-  btn1.setLongClickHandler([](Button2 & b) {
+  btn1.setLongClickHandler([](Button2& b) {
     currentScreen = -1;
     buttonPressed = true;
-  });
+    });
 
-
-  btn1.setPressedHandler([](Button2 & b) {
-    if(currentScreen == -1){
+  btn1.setPressedHandler([](Button2& b) {
+    if (currentScreen == -1)
+    {
       selection++;
       selection %= 5;
       screen.setSelectedMenuItemIndex(selection);
-  
+
       buttonPressed = true;
-    }else{
+    }
+    else
+    {
       subSelection++;
-      if (subSelection >= maxSubmenues[selection]) {
+      if (subSelection >= maxSubmenues[selection])
+      {
         subSelection = 0;
         //currentScreen = -1;
       }
       buttonPressed = true;
     }
-  });
+    });
 
-
-  btn2.setPressedHandler([](Button2 & b) {
-    if (currentScreen != selection) {
+  btn2.setPressedHandler([](Button2& b) {
+    if (currentScreen != selection)
+    {
       currentScreen = selection;
       subSelection = 0;
-    } else {
-      
+    }
+    else
+    {
     }
 
-
     buttonPressed = true;
-  });
+    });
 }
 
-void setupScreens(){
+void setupScreens()
+{
   screen.setSelectedMenuItemIndex(selection);
-  screen.setLCDPos(0,32);
+  screen.setLCDPos(0, 32);
   screen.setLcdScale(6);
 
   //Positioning of the screens
-  int screensOffsetX =4;
+  int screensOffsetX = 4;
 
-  ageWeightScreen.setPos(screensOffsetX,0);
-  effortScreen.setPos(screensOffsetX,0);
-  strengthScreen.setPos(screensOffsetX,0);
-  hungryScreen.setPos(screensOffsetX,0);
-  dpScreen.setPos(screensOffsetX,0);
-  sPercentageScreen.setPos(screensOffsetX,0);
-  tPercentageScreen.setPos(screensOffsetX,0);
-  clockScreen.setPos(screensOffsetX,0);
+  ageWeightScreen.setPos(screensOffsetX, 0);
+  effortScreen.setPos(screensOffsetX, 0);
+  strengthScreen.setPos(screensOffsetX, 0);
+  hungryScreen.setPos(screensOffsetX, 0);
+  dpScreen.setPos(screensOffsetX, 0);
+  sPercentageScreen.setPos(screensOffsetX, 0);
+  tPercentageScreen.setPos(screensOffsetX, 0);
+  clockScreen.setPos(screensOffsetX, 0);
 
   foodSelection.addOption("Meat", SYMBOL_MEAT);
   foodSelection.addOption("PILL", SYMBOL_PILL);
@@ -148,14 +138,14 @@ void setupScreens(){
   fightSelection.addOption("SINGLE");
   fightSelection.addOption("TAG");
 
-  
   clockScreen.setHours(hours);
   clockScreen.setMinutes(minutes);
   clockScreen.setSeconds(seconds);
 }
 
 // =========================================================================
-void setup(void) {
+void setup(void)
+{
   Serial.begin(115200);
   Serial.println("Start");
 
@@ -163,98 +153,97 @@ void setup(void) {
   digitalWrite(ADC_EN, HIGH);
 
   randomSeed(analogRead(1));
+
+  //Some tft initialization stuff
   tft.init();
-
-
   tft.setRotation(1);
   tft.fillScreen(0x86CE);
+
   button_init();
 
-
-  //screen.setDigimonAnimation(agumon_anim);
   setupScreens();
 }
 // =========================================================================
-
-
 
 unsigned long ticker = 0;
 unsigned long tickerResetValue = 1000;
 unsigned long lastDelta = 0;
 
-void loop() {
+void loop()
+{
 
   //tft.fillScreen(0x86CE);
   unsigned long t1 = millis();
 
   boolean locked = fpslock(lastDelta);
 
-  if ( !locked ) {
+  if (!locked)
+  {
     digimonScreen.randomMoveDigimon();
     clockScreen.incrementSeconds();
     digiNameScreen.scrollText();
   }
 
-  if ( !locked || buttonPressed ) {
-    switch (currentScreen) {
+  if (!locked || buttonPressed)
+  {
+    switch (currentScreen)
+    {
+    case 0:
+      switch (subSelection)
+      {
       case 0:
-        switch (subSelection) {
-          case 0:
-            screen.renderScreen(&digiNameScreen);
-            break;
-          case 1:
-            screen.renderScreen(&ageWeightScreen);
-            break;
-          case 2:
-            screen.renderScreen(&hungryScreen);
-            break;
-          case 3:
-            screen.renderScreen(&strengthScreen);
-            break;
-          case 4:
-            screen.renderScreen(&effortScreen);
-            break;
-          case 5:
-            screen.renderScreen(&dpScreen);
-            break;
-          case 6:
-            screen.renderScreen(&sPercentageScreen);
-            break;
-          case 7:
-            screen.renderScreen(&tPercentageScreen);
-            break;
-        }
+        screen.renderScreen(&digiNameScreen);
         break;
-
       case 1:
-        foodSelection.setSelection(subSelection);
-        screen.renderScreen(&foodSelection);
+        screen.renderScreen(&ageWeightScreen);
         break;
-
       case 2:
+        screen.renderScreen(&hungryScreen);
+        break;
+      case 3:
+        screen.renderScreen(&strengthScreen);
+        break;
+      case 4:
+        screen.renderScreen(&effortScreen);
+        break;
+      case 5:
+        screen.renderScreen(&dpScreen);
+        break;
+      case 6:
+        screen.renderScreen(&sPercentageScreen);
+        break;
+      case 7:
+        screen.renderScreen(&tPercentageScreen);
+        break;
+      }
+      break;
+
+    case 1:
+      foodSelection.setSelection(subSelection);
+      screen.renderScreen(&foodSelection);
+      break;
+
+    case 2:
       screen.renderScreen(&clockScreen);
       break;
 
-      case 3:
+    case 3:
       fightSelection.setSelection(subSelection);
       screen.renderScreen(&fightSelection);
       break;
 
-      default:
-        screen.renderScreen(&digimonScreen);
-        break;
+    default:
+      screen.renderScreen(&digimonScreen);
+      break;
     }
-
   }
-
 
   buttonPressed = false;
 
-
-
-  if (debug == true) {
+  if (debug == true)
+  {
     tft.setTextColor(TFT_BLACK);
-    tft.fillRect(0, 0 , 100, 10, 0xFFFF);
+    tft.fillRect(0, 0, 100, 10, 0xFFFF);
     tft.drawString(String((1000.0) / lastDelta) + " FPS", 0, 0);
 
     //tft.drawString(String(ax)+" ax", 0, 20);
@@ -268,13 +257,13 @@ void loop() {
   lastDelta = t2 - t1;
 }
 
-
-boolean fpslock(long delta) {
+boolean fpslock(long delta)
+{
   ticker += delta;
-  if (ticker > tickerResetValue) {
+  if (ticker > tickerResetValue)
+  {
     ticker = 0;
     return false;
   }
   return true;
 }
-
