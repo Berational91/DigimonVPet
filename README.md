@@ -1,7 +1,6 @@
 # Digimon V-Pet for ESP32/Arduino
-This is an early version of a Digimon VPet for the ESP32 and other Arduino compatible devices. 
-It's based on the [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI/) and should be compatible with every other Display supported by the Library. 
-But on the long-term this project will be independet of TFT_eSPI in order to make it compatible with more displays. 
+This is an early version of a Digimon VPet for the ESP32 and other Arduino compatible devices
+At the moment there are just [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI/) compatible Displays supported. But you can make your own Display working by just implementing an realization of the abstract DisplayAdapter Class with just 8 Methods.
 The Goal of this project is to implement a Digimon VPet with all the functionality of real VPets and compatibility to real Digimon VPets.
 
 <img src="screenshot.jpg" width="500" >
