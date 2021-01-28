@@ -83,3 +83,12 @@ void V20::SelectionScreen::draw(VPetLCD *lcd){
         lcd->drawCharArrayOnLCD(selectionText[text2], screenX + SPRITES_SYMBOL_RESOLUTION + 2+offsetX, screenY+SPRITES_SYMBOL_RESOLUTION+1, pixelColor);
   }
 }
+
+void V20::SelectionScreen::nextSelection(){
+  currentSelection++;
+  currentSelection %= nOptions;
+}
+
+uint8_t V20::SelectionScreen::getSelection(){
+return currentSelection;
+}

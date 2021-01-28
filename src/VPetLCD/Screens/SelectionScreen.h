@@ -40,7 +40,8 @@ namespace V20{
       void setIcon(uint8_t optionIndex, uint8_t symbolIndex);
 
       void setSelection(uint8_t _selection){currentSelection=_selection; };
-
+      void nextSelection();
+      uint8_t getSelection();
       void draw(VPetLCD *lcd);
   };
 

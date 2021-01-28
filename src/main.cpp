@@ -17,6 +17,8 @@
 #include "VPetLCD/Screens/ClockScreen.h"
 #include "VPetLCD/Screens/DigimonWatchingScreen.h"
 
+#include "GameLogic/ScreenStateMachine.h"
+
 #include "VPetLCD/DisplayAdapter/TFT_eSPI_Displayadapter.h"
 
 #include <TFT_eSPI.h>
@@ -40,12 +42,13 @@ Button2 btn2(BUTTON_2);
 //method for being fps independent
 boolean fpslock(long delta);
 
-boolean debug = false;
+boolean debug = true;
 
-int selection = 0;
-int currentScreen = -1;
-int subSelection = 0;
-int maxSubmenues[] = { 8, 4, 0, 2, 0 };
+uint32_t menuSelection = 0;
+int numberOfMenuEntries = 5;
+
+uint8_t menuFoodSelection =0;
+uint8_t menuFoodSelectionMax =4;
 
 int hours = 23;
 int minutes = 59;
@@ -54,6 +57,7 @@ int seconds = 0;
 boolean buttonPressed = false;
 
 VPetLCD screen(&displayAdapter, 40, 16);
+V20::DigimonWatchingScreen digimonScreen(DIGIMON_AGUMON, -8, 40, 0, 0);
 V20::DigimonNameScreen digiNameScreen("Agumon", DIGIMON_AGUMON, 24);
 V20::AgeWeightScreen ageWeightScreen(5, 21);
 V20::HeartsScreen hungryScreen("Hungry", 2, 4);
@@ -65,53 +69,124 @@ V20::PercentageScreen tPercentageScreen("WIN", 'T', 93);
 V20::SelectionScreen foodSelection(true);
 V20::SelectionScreen fightSelection(true);
 V20::ClockScreen clockScreen(true);
-V20::DigimonWatchingScreen digimonScreen(DIGIMON_AGUMON, -8, 40, 0, 0);
+
+
+//12 screens and 3 signals (one for each button)
+uint8_t numberOfScreens = 12;
+ScreenStateMachine stateMachine(numberOfScreens, 3);
+
+uint8_t digimonScreenId = stateMachine.addScreen(&digimonScreen);
+uint8_t digiNameScreenId = stateMachine.addScreen(&digiNameScreen);
+uint8_t ageWeightScreenId = stateMachine.addScreen(&ageWeightScreen);
+uint8_t hungryScreenId = stateMachine.addScreen(&hungryScreen);
+uint8_t strengthScreenId = stateMachine.addScreen(&strengthScreen);
+uint8_t effortScreenId = stateMachine.addScreen(&effortScreen);
+uint8_t dpScreenId = stateMachine.addScreen(&dpScreen);
+uint8_t sPercentageScreenId = stateMachine.addScreen(&sPercentageScreen);
+uint8_t tPercentageScreenId = stateMachine.addScreen(&tPercentageScreen);
+uint8_t foodSelectionId = stateMachine.addScreen(&foodSelection);
+uint8_t fightSelectionId = stateMachine.addScreen(&fightSelection);
+uint8_t clockScreenId = stateMachine.addScreen(&clockScreen);
+
+uint8_t confirmSignal = 0;
+uint8_t nextSignal = 1;
+uint8_t backSignal = 2;
+
+
+
+void stateMachineInit() {
+  stateMachine.printTransitions();
+  // in order to be able to go back to the digimon watching screen
+  // we will add a transition from every screen to the digimon watching screen
+  //triggered by the backsignal (backbutton)
+  for (int i = 1; i <= numberOfScreens + 1;i++) {
+    stateMachine.addTransition(i, digimonScreenId, backSignal);
+  }
+
+  //The Scale Menu transitions
+  stateMachine.addTransition(digiNameScreenId, ageWeightScreenId, nextSignal);
+  stateMachine.addTransition(ageWeightScreenId, hungryScreenId, nextSignal);
+  stateMachine.addTransition(hungryScreenId, strengthScreenId, nextSignal);
+  stateMachine.addTransition(strengthScreenId, effortScreenId, nextSignal);
+  stateMachine.addTransition(effortScreenId, dpScreenId, nextSignal);
+  stateMachine.addTransition(dpScreenId, sPercentageScreenId, nextSignal);
+  stateMachine.addTransition(sPercentageScreenId, tPercentageScreenId, nextSignal);
+  stateMachine.addTransition(tPercentageScreenId, digiNameScreenId, nextSignal);
+
+  //Transitions between clock screen and digimon watching screen
+  stateMachine.addTransition(digimonScreenId, clockScreenId, backSignal);
+  stateMachine.addTransition(clockScreenId, digimonScreenId, backSignal);
+
+
+  //Conditional transtitions from digimonScreen to the others (menuselection)
+  //this must be set, because unset transitions wont trigger transitionactions
+  stateMachine.addTransition(digimonScreenId, digimonScreenId, nextSignal);
+
+  stateMachine.addTransitionAction(digimonScreenId, nextSignal, []() {
+    
+    menuSelection++;
+    menuSelection %= numberOfMenuEntries;
+    screen.setSelectedMenuItemIndex(menuSelection);
+    });
+
+  stateMachine.addTransition(digimonScreenId, digimonScreenId, confirmSignal);
+
+  stateMachine.addTransitionAction(digimonScreenId, confirmSignal, []() {
+    Serial.print(menuSelection);
+    switch (menuSelection) {
+    case 0:
+      stateMachine.setCurrentScreen(digiNameScreenId);
+      break;
+    case 1:
+      stateMachine.setCurrentScreen(foodSelectionId);
+      break;
+    case 3:
+      stateMachine.setCurrentScreen(fightSelectionId);
+      break;
+    }
+
+    });
+
+    //adding functionality of buttons in food screen:
+    stateMachine.addTransition(foodSelectionId, foodSelectionId, nextSignal);
+    stateMachine.addTransitionAction(foodSelectionId, nextSignal, []() {
+        foodSelection.nextSelection();
+
+    });
+
+    //adding functionality of buttons in fight screen:
+    stateMachine.addTransition(fightSelectionId, fightSelectionId, nextSignal);
+    stateMachine.addTransitionAction(fightSelectionId, nextSignal, []() {
+        fightSelection.nextSelection();
+
+    });
+
+
+    
+
+}
 
 void button_init()
 {
   btn1.setLongClickHandler([](Button2& b) {
-    currentScreen = -1;
+    stateMachine.sendSignal(backSignal);
     buttonPressed = true;
     });
 
   btn1.setPressedHandler([](Button2& b) {
-    if (currentScreen == -1)
-    {
-      selection++;
-      selection %= 5;
-      screen.setSelectedMenuItemIndex(selection);
-
-      buttonPressed = true;
-    }
-    else
-    {
-      subSelection++;
-      if (subSelection >= maxSubmenues[selection])
-      {
-        subSelection = 0;
-        //currentScreen = -1;
-      }
-      buttonPressed = true;
-    }
+    stateMachine.sendSignal(nextSignal);
+    buttonPressed = true;
     });
 
   btn2.setPressedHandler([](Button2& b) {
-    if (currentScreen != selection)
-    {
-      currentScreen = selection;
-      subSelection = 0;
-    }
-    else
-    {
-    }
-
+    stateMachine.sendSignal(confirmSignal);
     buttonPressed = true;
     });
 }
 
 void setupScreens()
 {
-  screen.setSelectedMenuItemIndex(selection);
+  screen.setSelectedMenuItemIndex(menuSelection);
   screen.setLCDPos(0, 32);
   screen.setLcdScale(6);
 
@@ -162,6 +237,7 @@ void setup(void)
   button_init();
 
   setupScreens();
+  stateMachineInit();
 }
 // =========================================================================
 
@@ -184,58 +260,10 @@ void loop()
     digiNameScreen.scrollText();
   }
 
-  if (!locked || buttonPressed)
+
+  if (!locked || buttonPressed || true)
   {
-    switch (currentScreen)
-    {
-    case 0:
-      switch (subSelection)
-      {
-      case 0:
-        screen.renderScreen(&digiNameScreen);
-        break;
-      case 1:
-        screen.renderScreen(&ageWeightScreen);
-        break;
-      case 2:
-        screen.renderScreen(&hungryScreen);
-        break;
-      case 3:
-        screen.renderScreen(&strengthScreen);
-        break;
-      case 4:
-        screen.renderScreen(&effortScreen);
-        break;
-      case 5:
-        screen.renderScreen(&dpScreen);
-        break;
-      case 6:
-        screen.renderScreen(&sPercentageScreen);
-        break;
-      case 7:
-        screen.renderScreen(&tPercentageScreen);
-        break;
-      }
-      break;
-
-    case 1:
-      foodSelection.setSelection(subSelection);
-      screen.renderScreen(&foodSelection);
-      break;
-
-    case 2:
-      screen.renderScreen(&clockScreen);
-      break;
-
-    case 3:
-      fightSelection.setSelection(subSelection);
-      screen.renderScreen(&fightSelection);
-      break;
-
-    default:
-      screen.renderScreen(&digimonScreen);
-      break;
-    }
+    screen.renderScreen(stateMachine.getCurrentScreen());
   }
 
   buttonPressed = false;
