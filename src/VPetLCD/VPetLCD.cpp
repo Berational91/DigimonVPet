@@ -450,8 +450,7 @@ void VPetLCD::drawSmallIntegerOnLCD(int16_t integer, int16_t onLcdX, int16_t onL
  * This method has to be called in every method that renders something to the TFT_eSprite canvas attribute bevor drawing something
 */
 void VPetLCD::startRendering() {
-  canvas->createCanvas(240, 135);
-  canvas->setColorDepth(16);
+
   canvas->fillCanvas(backgroundColor);
   drawScaledGrid(lcdWidth, lcdHeight);
 }
@@ -465,7 +464,6 @@ void VPetLCD::endRendering() {
   // Specify what colour is to be treated as transparent (black in this example)
   canvas->pushCanvas(0, 0, transparencyColor);
   // Delete Sprite to free memory, creating and deleting takes very little time.
-  canvas->deleteCanvas();
 }
 
 //////////////////////Constructor/////////////////////////////
@@ -490,6 +488,9 @@ VPetLCD::VPetLCD(AbstractDisplayAdapter* displayAdapter, int lcdWidth, int lcdHe
 
   this->lcdScale = 6;
   this->selectedMenuItem = -1;
+
+  canvas->createCanvas(240, 135);
+  canvas->setColorDepth(16);
 }
 
 /////////////////////////////////////////////////////////////
