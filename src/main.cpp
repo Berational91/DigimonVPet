@@ -58,7 +58,6 @@ int seconds = 0;
 boolean buttonPressed = false;
 
 VPetLCD screen(&displayAdapter, 40, 16);
-VPetLCD serialScreen(&sDisplayAdapter, 32,16);
 
 V20::DigimonWatchingScreen digimonScreen(DIGIMON_AGUMON, -8, 40, 0, 0);
 V20::DigimonNameScreen digiNameScreen("Agumon", DIGIMON_AGUMON, 24);
