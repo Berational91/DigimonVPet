@@ -17,7 +17,7 @@
 #define N_SPRITES_DIGITS 10
 
 //there are 2 digits together
-const byte smallDigits[5][5] PROGMEM = {
+const byte SMALLDIGITS[5][5] PROGMEM = {
   {
     0b01110001,
     0b01010011,
@@ -56,7 +56,7 @@ const byte smallDigits[5][5] PROGMEM = {
   
 };
 
-const byte digits[10][7] PROGMEM = {
+const byte DIGITS[10][7] PROGMEM = {
 
   {
     0b01100000,
@@ -164,12 +164,12 @@ const byte digits[10][7] PROGMEM = {
 
 
 
-const uint16_t capitalLetterWidth[26] PROGMEM = {
+const uint16_t CAPITAL_LETTER_WIDTH[26] PROGMEM = {
 //a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z
   4, 4, 4, 4, 4, 4, 4, 4, 3, 4, 4, 4, 5, 5, 4, 4, 5, 4, 4, 5, 4, 5, 5, 5, 5, 5
 };
 
-const byte capitalAlphabetSmall[26][6] PROGMEM = {
+const byte CAPITAL_ALPHABET_SMALL [26][6] PROGMEM = {
 
   {
     0b01100000,

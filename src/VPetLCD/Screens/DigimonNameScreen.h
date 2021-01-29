@@ -5,13 +5,13 @@
 /////////////////////////////////////////////////////////////////
 
 #include "../VPetLCD.h"
-#include "DigimonSprites.h"
 
 namespace V20 {
 
   class DigimonNameScreen : public VPetLCD::Screen {
 
   private:
+    AbstractSpriteManager* spriteManager;
     char* digimonName;
     uint16_t scrollBoxWidth;
     int scrollOffsetX;
@@ -26,7 +26,7 @@ namespace V20 {
 
   public:
 
-    DigimonNameScreen(char _digimonName[], uint16_t _digimonSpriteIndex, uint16_t _scrollBoxWidth);
+    DigimonNameScreen(AbstractSpriteManager* _spriteManager, char _digimonName[], uint16_t _digimonSpriteIndex, uint16_t _scrollBoxWidth);
     void draw(VPetLCD* lcd);
     void scrollText();
     void setDigimonSpriteIndex(uint16_t _digimonSpriteIndex) { digimonSpriteIndex = _digimonSpriteIndex; };

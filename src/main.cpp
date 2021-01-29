@@ -19,17 +19,13 @@
 
 #include "GameLogic/ScreenStateMachine.h"
 
+//ESP32 Specific stuff
 #include "VPetLCD/DisplayAdapter/TFT_eSPI_Displayadapter.h"
+#include "VPetLCD/ESP32SpriteManager.h"
 
 #include <TFT_eSPI.h>
 #include "Button2.h"
 
-int displayHeight = 240;
-int displayWidth =135 ;
-
-TFT_eSPI tft = TFT_eSPI(displayWidth, displayHeight); // Create object "tft"
-TFT_eSprite img = TFT_eSprite(&tft);                  // Create Sprite object "img" with pointer to "tft" object
-TFT_eSPI_DisplayAdapter displayAdapter(&img,displayHeight,displayWidth);         //create a DisplayAdapter for VPetLCD class
 
 
 #define ADC_EN 14 //ADC_EN is the ADC detection enable port
@@ -57,10 +53,18 @@ int seconds = 0;
 
 boolean buttonPressed = false;
 
-VPetLCD screen(&displayAdapter, 40, 16);
+int displayHeight = 240;
+int displayWidth =135 ;
 
-V20::DigimonWatchingScreen digimonScreen(DIGIMON_AGUMON, -8, 40, 0, 0);
-V20::DigimonNameScreen digiNameScreen("Agumon", DIGIMON_AGUMON, 24);
+TFT_eSPI tft = TFT_eSPI(displayWidth, displayHeight); // Create object "tft"
+TFT_eSprite img = TFT_eSprite(&tft);                  // Create Sprite object "img" with pointer to "tft" object
+TFT_eSPI_DisplayAdapter displayAdapter(&img,displayHeight,displayWidth);         //create a DisplayAdapter for VPetLCD class
+ESP32SpriteManager spriteManager;
+
+VPetLCD screen(&displayAdapter, &spriteManager, 40, 16);
+
+V20::DigimonWatchingScreen digimonScreen(&spriteManager,DIGIMON_AGUMON, -8, 40, 0, 0);
+V20::DigimonNameScreen digiNameScreen(&spriteManager,"Agumon", DIGIMON_AGUMON, 24);
 V20::AgeWeightScreen ageWeightScreen(5, 21);
 V20::HeartsScreen hungryScreen("Hungry", 2, 4);
 V20::HeartsScreen strengthScreen("Strength", 3, 4);

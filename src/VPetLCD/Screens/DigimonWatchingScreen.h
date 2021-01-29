@@ -5,7 +5,6 @@
 /////////////////////////////////////////////////////////////////
 
 #include "../VPetLCD.h"
-#include "DigimonSprites.h"
 
 namespace V20{
 
@@ -13,6 +12,8 @@ namespace V20{
 
   class DigimonWatchingScreen : public VPetLCD::Screen{
     private:
+      AbstractSpriteManager* spriteManager;
+
       uint8_t digimonSpritesIndex;
       int8_t digimonX;
       int8_t digimonY;
@@ -37,7 +38,7 @@ namespace V20{
       boolean randomDecision(int percent);
 
     public:
-      DigimonWatchingScreen(uint8_t digimonSpritesIndex, int8_t _minX, int8_t _maxX,int8_t _minY, int8_t _maxY);
+      DigimonWatchingScreen(AbstractSpriteManager* _spriteManager,uint8_t digimonSpritesIndex, int8_t _minX, int8_t _maxX,int8_t _minY, int8_t _maxY);
       void draw(VPetLCD *lcd);
       void randomMoveDigimon(); 
       void setXLimitations(int8_t _minX, int8_t _maxX){minX = _minX; maxX = _maxX;};

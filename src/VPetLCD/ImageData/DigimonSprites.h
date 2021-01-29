@@ -13,6 +13,7 @@
 #define PROGMEM
 #endif
 
+
 #define N_DIGIMON 1
 #define N_SPRITES_PER_DIGIMON 12
 #define SPRITES_DIGIMON_RESOLUTION 16

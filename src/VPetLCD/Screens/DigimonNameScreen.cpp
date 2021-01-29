@@ -6,7 +6,7 @@
 
 #include "DigimonNameScreen.h"
 
-V20::DigimonNameScreen::DigimonNameScreen(char _digimonName[], uint16_t _digimonSpriteIndex, uint16_t _scrollBoxWidth) {
+V20::DigimonNameScreen::DigimonNameScreen(AbstractSpriteManager* _spriteManager,char _digimonName[], uint16_t _digimonSpriteIndex, uint16_t _scrollBoxWidth) {
 
   int namelength = strlen(_digimonName);
   char* buf = new char[namelength + 1];
@@ -15,7 +15,7 @@ V20::DigimonNameScreen::DigimonNameScreen(char _digimonName[], uint16_t _digimon
 
   digimonSpriteIndex = _digimonSpriteIndex;
   scrollBoxWidth = _scrollBoxWidth;
-
+  spriteManager=_spriteManager;
   //initializing it with 20 because, if it's zero before displaying the first time
   //the text will be out of box at the first displaying
   textwidth = 20;
@@ -28,7 +28,7 @@ void V20::DigimonNameScreen::calculateTextWidth(VPetLCD* lcd) {
   for (int i = 0; i < letters; i++) {
     char c = digimonName[i];
 
-    textwidth += lcd->getLetterWidth(c);
+    textwidth += spriteManager->getSmallCapitalLetterWidth(c);
   }
 }
 
@@ -36,7 +36,9 @@ void V20::DigimonNameScreen::calculateTextWidth(VPetLCD* lcd) {
 void V20::DigimonNameScreen::draw(VPetLCD* lcd) {
   //calculating the width of the text
 // void drawScrollBoxOnLCD(char text[], int16_t boxWidth, int16_t currentOffsetX, int16_t OnLcdX, int16_t OnLcdY, uint16_t color );
-  lcd->draw16BitArray(DIGIMON[digimonSpriteIndex][SPRITE_DIGIMON_WALK_0], screenX, screenY, false, pixelColor);
+  const unsigned short *sprite = spriteManager->getDigimonSprite(digimonSpriteIndex,SPRITE_DIGIMON_WALK_0);
+  
+  lcd->draw16BitArray(sprite, screenX, screenY, false, pixelColor);
   drawScrollBoxOnLCD(lcd, digimonName, scrollBoxWidth, scrollOffsetX, screenX + SPRITES_DIGIMON_RESOLUTION, screenY + 8, pixelColor);
 }
 
@@ -74,7 +76,7 @@ void V20::DigimonNameScreen::drawScrollBoxOnLCD(VPetLCD* lcd, char text[], int16
     //current character
     char c = text[i];
 
-    int spriteWidth = lcd->getLetterWidth(c);
+    int spriteWidth = spriteManager->getSmallCapitalLetterWidth(c);
     drawNegatedLetterOnLCD(lcd, c, OnLcdX, OnLcdX + boxWidth, OnLcdX + offsetX, OnLcdY, color);
 
     offsetX += spriteWidth + 1; //plus 1 because there should be a space of 1 pixel between characters
@@ -102,7 +104,7 @@ void V20::DigimonNameScreen::drawNegatedLetterOnLCD(VPetLCD* lcd, char c, int16_
 
   int spriteHeight = SPRITES_UPPERCASE_ALPHABET_HEIGHT;
   int spriteWidth = 4;
-
+  const byte* sprite = spriteManager->getSmallCapitalLetter(c);
   //array for the negated character with one bottom line more and one top line more
   byte negatedChar[] = { 0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF };
 
@@ -111,10 +113,10 @@ void V20::DigimonNameScreen::drawNegatedLetterOnLCD(VPetLCD* lcd, char c, int16_
     spriteWidth = 6;
   }  
 else {
-    spriteWidth = lcd->getLetterWidth(c);
+    spriteWidth = spriteManager->getSmallCapitalLetterWidth(c);
     for (int i = 0; i < SPRITES_UPPERCASE_ALPHABET_HEIGHT; i++) {
       //shifting left 
-      negatedChar[i + 1] = lcd->getLetterSpriteLine(c, i);
+      negatedChar[i + 1] = sprite[i];
       negatedChar[i + 1] = negatedChar[i + 1] >> 1;
       negatedChar[i + 1] = ~negatedChar[i + 1];
     }

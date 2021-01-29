@@ -7,7 +7,7 @@
 #include "DigimonWatchingScreen.h"
 #include <Arduino.h>
 
-V20::DigimonWatchingScreen::DigimonWatchingScreen(uint8_t digimonSpritesIndex, int8_t _minX, int8_t _maxX, int8_t _minY, int8_t _maxY) {
+V20::DigimonWatchingScreen::DigimonWatchingScreen(AbstractSpriteManager* _spriteManager,uint8_t digimonSpritesIndex, int8_t _minX, int8_t _maxX, int8_t _minY, int8_t _maxY) {
   setXLimitations(_minX, _maxX); // -8 32
   setYLimitations(_minY, _maxY);
   digimonX = 8;
@@ -18,7 +18,7 @@ V20::DigimonWatchingScreen::DigimonWatchingScreen(uint8_t digimonSpritesIndex, i
   probabilityChangeWalkingSprite = 60;
   probabilityMoveVertical = 25;
   probabilityMakeAnotherMove = 5;
-
+  spriteManager = _spriteManager;
 }
 
 
@@ -96,6 +96,7 @@ void V20::DigimonWatchingScreen::randomMoveDigimon() {
 }
 
 void V20::DigimonWatchingScreen::draw(VPetLCD* lcd) {
-  lcd->draw16BitArray(DIGIMON[digimonSpritesIndex][currentWalkSprite], digimonX, digimonY, !looksLeft, pixelColor);
+  const unsigned short *sprite = spriteManager->getDigimonSprite(digimonSpritesIndex, currentWalkSprite);
+  lcd->draw16BitArray(sprite, digimonX, digimonY, !looksLeft, pixelColor);
 }
 

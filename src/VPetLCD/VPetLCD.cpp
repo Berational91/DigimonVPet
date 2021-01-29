@@ -7,33 +7,6 @@
 /////////////////////////////////////////////////////////////////
 #include "VPetLCD.h"
 
-/**
- * Returns the width of the character on the simulated LCD
- *
- *  @param c the character
- *  @return width of the character in LCDPixels
- * */
-uint16_t VPetLCD::getLetterWidth(char c) {
-  if (c > 'Z') {
-    c -= 32;
-  }
-  int arrayPos = c - 65;
-  return capitalLetterWidth[arrayPos];
-}
-
-/**
- * Returns @param i'th line of the sprite of the character
- *
- *  @param c the character
- *  @return the i'th line of the characters sprite
- * */
-byte VPetLCD::getLetterSpriteLine(char c, uint16_t i) {
-  if (c > 'Z') {
-    c -= 32;
-  }
-  int arrayPos = c - 65;
-  return capitalAlphabetSmall[arrayPos][i];
-}
 
 /**
    This Function draws the Menu icon selected by the index on the actual screen (not the simulated LCD)
@@ -54,6 +27,8 @@ void VPetLCD::drawMenuItem(uint16_t index, int16_t x, int16_t y, uint16_t scale,
   //which has one 1 entry, which is shifted every iteration until the whole
   // image is restored
 
+  const uint32_t *sprite = spriteManager->getHighResMenuItem(index);
+
   for (int currentY = 0; currentY < SPRITES_MENU_RESOLUTION; currentY++) {
     //initializing mask to read pixel out of the integer
     unsigned int mask = 0b10000000000000000000000000000000;
@@ -64,7 +39,7 @@ void VPetLCD::drawMenuItem(uint16_t index, int16_t x, int16_t y, uint16_t scale,
 
     for (int currentX = 0; currentX < SPRITES_MENU_RESOLUTION; currentX++) {
 
-      if (menuItemSprites[index][currentY] & mask) {
+      if (sprite[currentY] & mask) {
         canvas->fillRect((x + currentX) * scale, (y + currentY) * scale, scale, scale, color);
       }
 
@@ -216,8 +191,8 @@ void VPetLCD::drawSymbol(uint16_t index, int16_t onLcdX, int16_t onLcdY, boolean
 
   int spriteWidth = SPRITES_SYMBOL_RESOLUTION;
   int spriteHeight = SPRITES_SYMBOL_RESOLUTION;
-
-  drawByteArray(symbols[index], spriteWidth, spriteHeight, onLcdX, onLcdY, mirror, color);
+  const byte* sprite = spriteManager->getSymbol(index);
+  drawByteArray(sprite, spriteWidth, spriteHeight, onLcdX, onLcdY, mirror, color);
 }
 
 /**
@@ -251,15 +226,11 @@ void VPetLCD::drawLetterOnLCD(char c, int16_t onLcdX, int16_t onLcdY, uint16_t c
   int spriteHeight = SPRITES_UPPERCASE_ALPHABET_HEIGHT;
   int spriteWidth = 4;
 
-  //make character uppercase if its not
-  if (c > 'Z') {
-    c -= 32;
-  }
-  //position of the image data in the array capitalAlphabet in the flash memory (65 is the ASCII value of A, which is in position 0 in capitalAlphabet)
-  int arrayPos = c - 65;
-  spriteWidth = capitalLetterWidth[arrayPos];
 
-  drawByteArray(capitalAlphabetSmall[arrayPos], spriteWidth, spriteHeight, onLcdX, onLcdY, false, color);
+  spriteWidth = spriteManager->getSmallCapitalLetterWidth(c);
+  const byte* sprite = spriteManager->getSmallCapitalLetter(c);
+
+  drawByteArray(sprite, spriteWidth, spriteHeight, onLcdX, onLcdY, false, color);
 }
 
 /**
@@ -282,14 +253,7 @@ void VPetLCD::drawCharArrayOnLCD(char charArr[], int16_t onLcdX, int16_t onLcdY,
     //current character
     char c = charArr[i];
 
-    //make character uppercase if its not
-    if (c > 'Z') {
-      c -= 32;
-    }
-
-    //position of the image data in the array capitalAlphabet in the flash memory (65 is the ASCII value of A, which is in position 0 in capitalAlphabet)
-    int arrayPos = c - 65;
-    int spriteWidth = capitalLetterWidth[arrayPos];
+    int spriteWidth = spriteManager->getSmallCapitalLetterWidth(c);
 
     drawLetterOnLCD(c, onLcdX + offsetX, onLcdY, color);
 
@@ -309,7 +273,9 @@ void VPetLCD::drawCharArrayOnLCD(char charArr[], int16_t onLcdX, int16_t onLcdY,
 void VPetLCD::drawDigitOnLCD(int16_t digit, int16_t onLcdX, int16_t onLcdY, uint16_t color) {
   int spriteHeight = SPRITES_DIGITS_HEIGHT;
   int spriteWidth = SPRITES_DIGITS_WIDTH;
-  drawByteArray(digits[digit], spriteWidth, spriteHeight, onLcdX, onLcdY, false, color);
+  const byte* sprite = spriteManager->getDigitSprite(digit);
+
+  drawByteArray(sprite, spriteWidth, spriteHeight, onLcdX, onLcdY, false, color);
 }
 
 /**
@@ -324,7 +290,7 @@ void VPetLCD::drawDigitOnLCD(int16_t digit, int16_t onLcdX, int16_t onLcdY, uint
 void VPetLCD::drawSmallDigitOnLCD(int16_t digit, int16_t onLcdX, int16_t onLcdY, uint16_t color) {
   int spriteHeight = SPRITES_SMALL_DIGITS_HEIGHT;
   int spriteWidth = SPRITES_SMALL_DIGITS_WIDTH;
-
+  const byte* sprite = spriteManager->getSmallDigitsSprite(digit / 2);
   byte mask = 0b01000000;
 
   //since the small digits are compressed (2 digits in one sprite), determine if the sprite is left (even) or right (odd)
@@ -336,13 +302,14 @@ void VPetLCD::drawSmallDigitOnLCD(int16_t digit, int16_t onLcdX, int16_t onLcdY,
   for (int currentY = 0; currentY < spriteHeight; currentY++) {
     if (digit % 2 == 1) {
       mask = 0b00000100;
-    }    
-else {
+    }
+    else {
       mask = 0b01000000;
     }
     for (int currentX = 0; currentX < spriteWidth; currentX++) {
+
       //the digit/2 is in order to get the correct index of the sprite, since there are 2 digits together in the smallsprites
-      if (smallDigits[digit / 2][currentY] & mask) {
+      if (sprite[currentY] & mask) {
         drawPixelOnLCD(onLcdX + currentX, onLcdY + currentY, color);
       }
       mask = mask >> 1;
@@ -475,14 +442,12 @@ void VPetLCD::endRendering() {
    @param lcdWidth determines the width in Pixels of the virtual VPET-LCD (32  for VPet 20th)
    @param lcdHeight determines the width in Pixels of the virtual VPET-LCD (16  for VPet 20th)
 */
-VPetLCD::VPetLCD(AbstractDisplayAdapter* displayAdapter, int lcdWidth, int lcdHeight) {
+VPetLCD::VPetLCD(AbstractDisplayAdapter* displayAdapter, AbstractSpriteManager* _spriteManager, int lcdWidth, int lcdHeight) {
 
   this->canvas = displayAdapter;
   this->lcdHeight = lcdHeight;
   this->lcdWidth = lcdWidth;
-  setSymbols(SYMBOLS);
-  this->setMenuItems(menuItems);
-
+  spriteManager = _spriteManager;
   this->lcdX = 0;
   this->lcdY = SPRITES_MENU_RESOLUTION;
 
@@ -493,29 +458,4 @@ VPetLCD::VPetLCD(AbstractDisplayAdapter* displayAdapter, int lcdWidth, int lcdHe
   canvas->setColorDepth(16);
 }
 
-/////////////////////////////////////////////////////////////
 
-/*
-/**
- * Sets the array attribute containing the symbol sprites
- */
-void VPetLCD::setSymbols(const byte sprite[][8]) {
-  Serial.println("entering setsymbols");
-  for (int i = 0; i < N_SPRITES_SYMBOL; i++) {
-
-    for (int j = 0; j < SPRITES_SYMBOL_RESOLUTION; j++) {
-      this->symbols[i][j] = sprite[i][j];
-    }
-  }
-}
-
-/**
- * Sets the array containing the menu item sprites
- */
-void VPetLCD::setMenuItems(const unsigned int sprite[10][32]) {
-  for (int i = 0; i < N_SPRITES_MENU; i++) {
-    for (int j = 0; j < SPRITES_MENU_RESOLUTION; j++) {
-      this->menuItemSprites[i][j] = sprite[i][j];
-    }
-  }
-}

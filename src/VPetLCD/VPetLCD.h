@@ -11,9 +11,8 @@
 #define VPetLCD_h
 ////////////////////////////////////////////////////////////////
 #include <TFT_eSPI.h>
-#include "LettersAndDigits.h"
-#include "Screens/SymbolData.h"
 #include "DisplayAdapter/AbstractDisplayadapter.h"
+#include "AbstractSpriteManager.h"
 
 
 #define SPRITES_DIGIMON_RESOLUTION 16
@@ -25,8 +24,7 @@ class VPetLCD {
   private:
 
     AbstractDisplayAdapter *canvas;
-    unsigned int menuItemSprites[N_SPRITES_MENU][SPRITES_MENU_RESOLUTION];
-    byte symbols[N_SPRITES_SYMBOL][SPRITES_SYMBOL_RESOLUTION];
+    AbstractSpriteManager *spriteManager;
 
 
     uint16_t lcdWidth;
@@ -37,8 +35,6 @@ class VPetLCD {
 
 
     int16_t selectedMenuItem;
-
-
 
     uint16_t transparencyColor = 0;
     uint16_t backgroundColor = 0x86CE;
@@ -76,17 +72,13 @@ class VPetLCD {
 
     
     //Constructor
-    VPetLCD(AbstractDisplayAdapter *displayAdapter, int lcdWidth, int lcdHeight);
+    VPetLCD(AbstractDisplayAdapter *displayAdapter, AbstractSpriteManager* _spriteManager, int lcdWidth, int lcdHeight);
 
     //sets the Position of the virtual LCD on the screen
     void setLCDPos(int x, int y){lcdX=x;lcdY=y; }
 
     //sets the Position of the virtual LCD on the screen
     void setLcdScale(int scale){lcdScale=scale; };
-
-    void setSymbols(const byte sprite[][8]);
-    void setMenuItems(const unsigned int sprite[][32]);
-
 
   // Abstract class for Screens. Every Screen must be an underclass of screen.
   // after implementing the draw(...) method, one can it with the renderScreen(...) Method
@@ -114,10 +106,6 @@ class VPetLCD {
     void setSelectedMenuItemIndex(int16_t index) {
       selectedMenuItem = index;
     }
-
-
-    uint16_t getLetterWidth(char c);
-    byte getLetterSpriteLine(char c, uint16_t i);
 
 
 };

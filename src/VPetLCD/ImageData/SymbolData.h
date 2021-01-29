@@ -1,7 +1,7 @@
 // These are the 32x32 Monochrome Menu Icons stored in 32 32bit unsigned integer to decrease memory Usage.
 // Each image needs 128 Byte
 #pragma once
-
+#include <Arduino.h>
 #if defined(__AVR__)
 #include <avr/pgmspace.h>
 #elif defined(__PIC32MX__)
@@ -238,7 +238,7 @@ const byte SYMBOLS[N_SPRITES_SYMBOL][SPRITES_SYMBOL_RESOLUTION] PROGMEM = {
 };
 
 
-const unsigned int menuItems[N_SPRITES_MENU][SPRITES_MENU_RESOLUTION] PROGMEM = {
+const uint32_t MENU_ITEMS[N_SPRITES_MENU][SPRITES_MENU_RESOLUTION] PROGMEM = {
 
   { 0b00000000000000000000000000000000,
     0b00000000000000000000000000000000,
