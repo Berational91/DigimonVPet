@@ -7,7 +7,7 @@ private:
 
 public:
 
-      TFT_eSPI_DisplayAdapter(TFT_eSprite* eSprite) { this->eSprite = eSprite; }
+      TFT_eSPI_DisplayAdapter(TFT_eSprite* eSprite, uint16_t resolutionX, uint16_t resolutionY):AbstractDisplayAdapter(resolutionX,resolutionY) { this->eSprite = eSprite; }
 
       //Draws a filled colored rectangle on pos (x,y) with width w and height h 
       void fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color);
@@ -21,8 +21,7 @@ public:
 
 
       //This method creates a Canvas on which could be drawn
-      void createCanvas(int16_t width, int16_t height);
-
+      void createCanvas();
 
       //This method sets the colorDepth of the Canvas
       void setColorDepth(int8_t b);

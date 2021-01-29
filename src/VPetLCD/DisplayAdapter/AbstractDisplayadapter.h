@@ -3,8 +3,11 @@
 
 class AbstractDisplayAdapter {
 
+protected:
+    uint16_t canvasWidth;
+    uint16_t canvasHeight;
 public:
-
+    AbstractDisplayAdapter(uint16_t resolutionX, uint16_t resolutionY){canvasWidth=resolutionX; canvasHeight=resolutionY; }
     //Draws a filled colored rectangle on pos (x,y) with width w and height h 
     virtual void fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color);
 
@@ -15,8 +18,8 @@ public:
     virtual void drawVLine(int32_t x, int32_t y, int32_t h, uint32_t color);
 
 
-    //This method creates a Canvas on which could be drawn
-    virtual void createCanvas(int16_t width, int16_t height);
+    //This method creates a Canvas on which could be drawn with the dimensions canvasWidth and canvasWidth
+    virtual void createCanvas();
 
 
     //This method sets the colorDepth of the Canvas

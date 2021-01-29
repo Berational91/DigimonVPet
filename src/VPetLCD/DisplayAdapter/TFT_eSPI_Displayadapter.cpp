@@ -17,8 +17,8 @@ void TFT_eSPI_DisplayAdapter::drawVLine(int32_t x, int32_t y, int32_t h, uint32_
 
 
 //This method creates a Canvas on which could be drawn
-void TFT_eSPI_DisplayAdapter::createCanvas(int16_t width, int16_t height) {
-    eSprite->createSprite(width, height);
+void TFT_eSPI_DisplayAdapter::createCanvas() {
+    eSprite->createSprite(canvasWidth, canvasHeight);
 }
 
 

@@ -489,7 +489,7 @@ VPetLCD::VPetLCD(AbstractDisplayAdapter* displayAdapter, int lcdWidth, int lcdHe
   this->lcdScale = 6;
   this->selectedMenuItem = -1;
 
-  canvas->createCanvas(240, 135);
+  canvas->createCanvas();
   canvas->setColorDepth(16);
 }
 
