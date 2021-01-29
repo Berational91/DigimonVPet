@@ -143,4 +143,8 @@ VPetLCD::Screen* ScreenStateMachine::getCurrentScreen() {
     return screens[getIndex(currentScreenId)];
 }
 
-
+/**
+ * Sets the current screen to given Screen, without triggering a transition or transitionAction
+ * @param screenId the screen to be set
+ */
+void ScreenStateMachine::setCurrentScreen(uint8_t screenId){currentScreenId = screenId;}

@@ -36,8 +36,14 @@ private:
     
     uint8_t currentScreenId;
 
+
+    //Method to calculate the index of the screens in the array out of the id
     uint8_t getIndex(uint8_t screenId){ return screenId-1;};
+
+    //Method to calculate the id of the screens in the array out of their index 
     uint8_t getId(uint8_t index){ return index+1;};
+
+
 public:
 
     ScreenStateMachine(uint8_t _numberOfScreens, uint8_t _numberOfSignals);
@@ -52,10 +58,8 @@ public:
 
     VPetLCD::Screen* getCurrentScreen();
 
-    void setCurrentScreen(uint8_t screenId){currentScreenId = screenId;};
+    void setCurrentScreen(uint8_t screenId);
     
-
-
     void printTransitions();
 
 };
