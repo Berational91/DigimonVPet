@@ -24,12 +24,13 @@
 #include <TFT_eSPI.h>
 #include "Button2.h"
 
-int displayWidth = 135;
 int displayHeight = 240;
+int displayWidth =135 ;
 
 TFT_eSPI tft = TFT_eSPI(displayWidth, displayHeight); // Create object "tft"
 TFT_eSprite img = TFT_eSprite(&tft);                  // Create Sprite object "img" with pointer to "tft" object
-TFT_eSPI_DisplayAdapter displayAdapter(&img);         //create a DisplayAdapter for VPetLCD class
+TFT_eSPI_DisplayAdapter displayAdapter(&img,displayHeight,displayWidth);         //create a DisplayAdapter for VPetLCD class
+
 
 #define ADC_EN 14 //ADC_EN is the ADC detection enable port
 #define ADC_PIN 34
@@ -47,8 +48,8 @@ boolean debug = true;
 uint32_t menuSelection = 0;
 int numberOfMenuEntries = 5;
 
-uint8_t menuFoodSelection =0;
-uint8_t menuFoodSelectionMax =4;
+uint8_t menuFoodSelection = 0;
+uint8_t menuFoodSelectionMax = 4;
 
 int hours = 23;
 int minutes = 59;
@@ -57,6 +58,8 @@ int seconds = 0;
 boolean buttonPressed = false;
 
 VPetLCD screen(&displayAdapter, 40, 16);
+VPetLCD serialScreen(&sDisplayAdapter, 32,16);
+
 V20::DigimonWatchingScreen digimonScreen(DIGIMON_AGUMON, -8, 40, 0, 0);
 V20::DigimonNameScreen digiNameScreen("Agumon", DIGIMON_AGUMON, 24);
 V20::AgeWeightScreen ageWeightScreen(5, 21);
@@ -73,6 +76,11 @@ V20::ClockScreen clockScreen(true);
 
 //12 screens and 3 signals (one for each button)
 uint8_t numberOfScreens = 12;
+
+uint8_t confirmSignal = 0;
+uint8_t nextSignal = 1;
+uint8_t backSignal = 2;
+
 ScreenStateMachine stateMachine(numberOfScreens, 3);
 
 uint8_t digimonScreenId = stateMachine.addScreen(&digimonScreen);
@@ -88,9 +96,7 @@ uint8_t foodSelectionId = stateMachine.addScreen(&foodSelection);
 uint8_t fightSelectionId = stateMachine.addScreen(&fightSelection);
 uint8_t clockScreenId = stateMachine.addScreen(&clockScreen);
 
-uint8_t confirmSignal = 0;
-uint8_t nextSignal = 1;
-uint8_t backSignal = 2;
+
 
 
 
@@ -119,18 +125,20 @@ void stateMachineInit() {
 
 
   //Conditional transtitions from digimonScreen to the others (menuselection)
-  //this must be set, because unset transitions wont trigger transitionactions
+  //this must be set, because unset transitions wont trigger transitionActions
   stateMachine.addTransition(digimonScreenId, digimonScreenId, nextSignal);
 
+  //if nextSignal is sent (nextbutton pressed), the menuselection will be
+  //incremented and the selection will be set
   stateMachine.addTransitionAction(digimonScreenId, nextSignal, []() {
-    
+
     menuSelection++;
     menuSelection %= numberOfMenuEntries;
     screen.setSelectedMenuItemIndex(menuSelection);
     });
 
+  //Here are the conditional transitions handled.
   stateMachine.addTransition(digimonScreenId, digimonScreenId, confirmSignal);
-
   stateMachine.addTransitionAction(digimonScreenId, confirmSignal, []() {
     Serial.print(menuSelection);
     switch (menuSelection) {
@@ -138,33 +146,33 @@ void stateMachineInit() {
       stateMachine.setCurrentScreen(digiNameScreenId);
       break;
     case 1:
+      foodSelection.setSelection(0);
       stateMachine.setCurrentScreen(foodSelectionId);
       break;
     case 3:
+      fightSelection.setSelection(0);
       stateMachine.setCurrentScreen(fightSelectionId);
       break;
     }
-
-    });
-
-    //adding functionality of buttons in food screen:
-    stateMachine.addTransition(foodSelectionId, foodSelectionId, nextSignal);
-    stateMachine.addTransitionAction(foodSelectionId, nextSignal, []() {
-        foodSelection.nextSelection();
-
-    });
-
-    //adding functionality of buttons in fight screen:
-    stateMachine.addTransition(fightSelectionId, fightSelectionId, nextSignal);
-    stateMachine.addTransitionAction(fightSelectionId, nextSignal, []() {
-        fightSelection.nextSelection();
-
     });
 
 
-    
+  //adding functionality of buttons in food screen:
+  stateMachine.addTransition(foodSelectionId, foodSelectionId, nextSignal);
+  stateMachine.addTransitionAction(foodSelectionId, nextSignal, []() {
+    foodSelection.nextSelection();
+    });
+
+  //adding functionality of buttons in fight screen:
+  stateMachine.addTransition(fightSelectionId, fightSelectionId, nextSignal);
+  stateMachine.addTransitionAction(fightSelectionId, nextSignal, []() {
+    fightSelection.nextSelection();
+
+    });
+
 
 }
+
 
 void button_init()
 {
