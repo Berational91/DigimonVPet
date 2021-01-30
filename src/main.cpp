@@ -16,7 +16,7 @@
 #include "VPetLCD/Screens/SelectionScreen.h"
 #include "VPetLCD/Screens/ClockScreen.h"
 #include "VPetLCD/Screens/DigimonWatchingScreen.h"
-#include "VPetLCD/Screens/AnimationScreenGenerator.h"
+#include "VPetLCD/Screens/AnimationScreens/EatingAnimationScreen.h"
 
 #include "GameLogic/ScreenStateMachine.h"
 
@@ -76,13 +76,10 @@ V20::PercentageScreen tPercentageScreen("WIN", 'T', 93);
 V20::SelectionScreen foodSelection(true);
 V20::SelectionScreen fightSelection(true);
 V20::ClockScreen clockScreen(true);
-V20::AnimationScreen* eatingMeatAnimation = V20::AnimationScreenGenerator::getEatMeatScreen(&spriteManager, DIGIMON_AGUMON);
-V20::AnimationScreen* eatingPillAnimation = V20::AnimationScreenGenerator::getEatPillScreen(&spriteManager, DIGIMON_AGUMON);
-V20::AnimationScreen* eatingPoopAnimation = V20::AnimationScreenGenerator::getEatPoopScreen(&spriteManager, DIGIMON_AGUMON);
-V20::AnimationScreen* eatingLoveAnimation = V20::AnimationScreenGenerator::getEatLoveScreen(&spriteManager, DIGIMON_AGUMON);
+V20::EatingAnimationScreen eatingAnimationScreen(&spriteManager, DIGIMON_AGUMON);
 
 //13 screens and 3 signals (one for each button)
-uint8_t numberOfScreens = 16;
+uint8_t numberOfScreens = 13;
 
 uint8_t confirmSignal = 0;
 uint8_t nextSignal = 1;
@@ -102,10 +99,7 @@ uint8_t tPercentageScreenId = stateMachine.addScreen(&tPercentageScreen);
 uint8_t foodSelectionId = stateMachine.addScreen(&foodSelection);
 uint8_t fightSelectionId = stateMachine.addScreen(&fightSelection);
 uint8_t clockScreenId = stateMachine.addScreen(&clockScreen);
-uint8_t eatingMeatAnimationScreenId = stateMachine.addScreen(eatingMeatAnimation);;
-uint8_t eatingPillAnimationScreenId = stateMachine.addScreen(eatingPillAnimation);;
-uint8_t eatingPoopAnimationScreenId = stateMachine.addScreen(eatingPoopAnimation);;
-uint8_t eatingLoveAnimationScreenId = stateMachine.addScreen(eatingLoveAnimation);;
+uint8_t eatingAnimationScreenId = stateMachine.addScreen(&eatingAnimationScreen);
 
 
 
@@ -113,22 +107,11 @@ uint8_t eatingLoveAnimationScreenId = stateMachine.addScreen(eatingLoveAnimation
 void stateMachineInit() {
 
   //return to main screen after showing eating animation
-  eatingMeatAnimation->setAnimationEndAction([]() {
+  eatingAnimationScreen.setAnimationEndAction([]() {
     stateMachine.setCurrentScreen(digimonScreenId);
 
     });
-  eatingPillAnimation->setAnimationEndAction([]() {
-    stateMachine.setCurrentScreen(digimonScreenId);
 
-    });
-  eatingPoopAnimation->setAnimationEndAction([]() {
-    stateMachine.setCurrentScreen(digimonScreenId);
-
-    });
-  eatingLoveAnimation->setAnimationEndAction([]() {
-    stateMachine.setCurrentScreen(digimonScreenId);
-
-    });
 
   // in order to be able to go back to the digimon watching screen
   // we will add a transition from every screen to the digimon watching screen
@@ -197,21 +180,25 @@ void stateMachineInit() {
     uint8_t selection = foodSelection.getSelection();
     switch (selection) {
     case 0:
-      eatingMeatAnimation->startAnimation();
-      stateMachine.setCurrentScreen(eatingMeatAnimationScreenId);
+      eatingAnimationScreen.setSprites(SYMBOL_MEAT, SYMBOL_HALF_MEAT,SYMBOL_EMPTY_MEAT);
+      eatingAnimationScreen.startAnimation();
+      stateMachine.setCurrentScreen(eatingAnimationScreenId);
       break;
     case 1:
-      eatingPillAnimation->startAnimation();
-      stateMachine.setCurrentScreen(eatingPillAnimationScreenId);
+      eatingAnimationScreen.setSprites(SYMBOL_PILL, SYMBOL_HALF_PILL,SYMBOL_EMPTY);
+      eatingAnimationScreen.startAnimation();
+      stateMachine.setCurrentScreen(eatingAnimationScreenId);
       break;
 
     case 2:
-      eatingLoveAnimation->startAnimation();
-      stateMachine.setCurrentScreen(eatingLoveAnimationScreenId);
+      eatingAnimationScreen.setSprites(SYMBOL_HEART, SYMBOL_HEARTEMPTY,SYMBOL_EMPTY);
+      eatingAnimationScreen.startAnimation();
+      stateMachine.setCurrentScreen(eatingAnimationScreenId);
       break;
     case 3:
-      eatingPoopAnimation->startAnimation();
-      stateMachine.setCurrentScreen(eatingPoopAnimationScreenId);
+      eatingAnimationScreen.setSprites(SYMBOL_POOP,SYMBOL_HALF_PILL,SYMBOL_EMPTY);
+      eatingAnimationScreen.startAnimation();
+      stateMachine.setCurrentScreen(eatingAnimationScreenId);
       break;
 
     }
@@ -265,10 +252,8 @@ void setupScreens()
   sPercentageScreen.setPos(screensOffsetX, 0);
   tPercentageScreen.setPos(screensOffsetX, 0);
   clockScreen.setPos(screensOffsetX, 0);
-  eatingMeatAnimation->setPos(screensOffsetX, 0);
-  eatingPillAnimation->setPos(screensOffsetX, 0);
-  eatingPoopAnimation->setPos(screensOffsetX, 0);
-  eatingLoveAnimation->setPos(screensOffsetX, 0);
+  eatingAnimationScreen.setPos(screensOffsetX, 0);
+  
 
 
   //adding the food selection options
@@ -329,14 +314,8 @@ void loop()
     digiNameScreen.scrollText();
 
     //switch to next frame only when the screen is active
-    if (stateMachine.getCurrentScreen() == eatingMeatAnimation)
-      eatingMeatAnimation->nextFrame();
-    if (stateMachine.getCurrentScreen() == eatingPillAnimation)
-      eatingPillAnimation->nextFrame();
-    if (stateMachine.getCurrentScreen() == eatingPoopAnimation)
-      eatingPoopAnimation->nextFrame();
-    if (stateMachine.getCurrentScreen() == eatingLoveAnimation)
-      eatingLoveAnimation->nextFrame();
+    if (stateMachine.getCurrentScreen() == &eatingAnimationScreen)
+      eatingAnimationScreen.nextFrame();
   }
 
 

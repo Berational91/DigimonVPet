@@ -31,11 +31,12 @@ boolean V20::AnimationScreen::addFrame(std::function<void(VPetLCD* lcd, Animatio
 }
 
 /**
- * Draws the current frame of the animation
- *
+ * Draws the current frame of the animation if currentframe is not -1
+ *  
  * */
 void V20::AnimationScreen::draw(VPetLCD* lcd) {
     //just calling the function of the current frame
+    if(currentFrame != -1)
     frames[currentFrame](lcd, this);
 }
 

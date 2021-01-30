@@ -3,7 +3,7 @@
   Created by Berat Özdemir, January 24 , 2021.
 */
 /////////////////////////////////////////////////////////////////
-
+#pragma once
 #include "../VPetLCD.h"
 #include <functional>
 
