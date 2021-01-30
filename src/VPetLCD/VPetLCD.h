@@ -92,6 +92,9 @@ class VPetLCD {
         virtual void draw(VPetLCD *lcd) = 0;
         void setPixelColor(uint16_t color){pixelColor=color;};
         void setPos(uint16_t x, uint16_t y){screenX = x; screenY = y;};
+        uint16_t getPosX(){return screenX;};
+        uint16_t getPosY(){return screenY;};
+        uint16_t getPixelColor(){return pixelColor;};
     };
 
     //Renders the Content of the Virtual LCD according to the Screen Object

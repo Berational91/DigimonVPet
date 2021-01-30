@@ -16,6 +16,7 @@
 #include "VPetLCD/Screens/SelectionScreen.h"
 #include "VPetLCD/Screens/ClockScreen.h"
 #include "VPetLCD/Screens/DigimonWatchingScreen.h"
+#include "VPetLCD/Screens/AnimationScreenGenerator.h"
 
 #include "GameLogic/ScreenStateMachine.h"
 
@@ -39,7 +40,7 @@ Button2 btn2(BUTTON_2);
 //method for being fps independent
 boolean fpslock(long delta);
 
-boolean debug = true;
+boolean debug = false;
 
 uint32_t menuSelection = 0;
 int numberOfMenuEntries = 5;
@@ -54,17 +55,17 @@ int seconds = 0;
 boolean buttonPressed = false;
 
 int displayHeight = 240;
-int displayWidth =135 ;
+int displayWidth = 135;
 
 TFT_eSPI tft = TFT_eSPI(displayWidth, displayHeight); // Create object "tft"
 TFT_eSprite img = TFT_eSprite(&tft);                  // Create Sprite object "img" with pointer to "tft" object
-TFT_eSPI_DisplayAdapter displayAdapter(&img,displayHeight,displayWidth);         //create a DisplayAdapter for VPetLCD class
+TFT_eSPI_DisplayAdapter displayAdapter(&img, displayHeight, displayWidth);         //create a DisplayAdapter for VPetLCD class
 ESP32SpriteManager spriteManager;
 
 VPetLCD screen(&displayAdapter, &spriteManager, 40, 16);
 
-V20::DigimonWatchingScreen digimonScreen(&spriteManager,DIGIMON_AGUMON, -8, 40, 0, 0);
-V20::DigimonNameScreen digiNameScreen(&spriteManager,"Agumon", DIGIMON_AGUMON, 24);
+V20::DigimonWatchingScreen digimonScreen(&spriteManager, DIGIMON_AGUMON, -8, 40, 0, 0);
+V20::DigimonNameScreen digiNameScreen(&spriteManager, "Agumon", DIGIMON_AGUMON, 24);
 V20::AgeWeightScreen ageWeightScreen(5, 21);
 V20::HeartsScreen hungryScreen("Hungry", 2, 4);
 V20::HeartsScreen strengthScreen("Strength", 3, 4);
@@ -75,10 +76,13 @@ V20::PercentageScreen tPercentageScreen("WIN", 'T', 93);
 V20::SelectionScreen foodSelection(true);
 V20::SelectionScreen fightSelection(true);
 V20::ClockScreen clockScreen(true);
+V20::AnimationScreen* eatingMeatAnimation = V20::AnimationScreenGenerator::getEatMeatScreen(&spriteManager, DIGIMON_AGUMON);
+V20::AnimationScreen* eatingPillAnimation = V20::AnimationScreenGenerator::getEatPillScreen(&spriteManager, DIGIMON_AGUMON);
+V20::AnimationScreen* eatingPoopAnimation = V20::AnimationScreenGenerator::getEatPoopScreen(&spriteManager, DIGIMON_AGUMON);
+V20::AnimationScreen* eatingLoveAnimation = V20::AnimationScreenGenerator::getEatLoveScreen(&spriteManager, DIGIMON_AGUMON);
 
-
-//12 screens and 3 signals (one for each button)
-uint8_t numberOfScreens = 12;
+//13 screens and 3 signals (one for each button)
+uint8_t numberOfScreens = 16;
 
 uint8_t confirmSignal = 0;
 uint8_t nextSignal = 1;
@@ -98,13 +102,34 @@ uint8_t tPercentageScreenId = stateMachine.addScreen(&tPercentageScreen);
 uint8_t foodSelectionId = stateMachine.addScreen(&foodSelection);
 uint8_t fightSelectionId = stateMachine.addScreen(&fightSelection);
 uint8_t clockScreenId = stateMachine.addScreen(&clockScreen);
-
+uint8_t eatingMeatAnimationScreenId = stateMachine.addScreen(eatingMeatAnimation);;
+uint8_t eatingPillAnimationScreenId = stateMachine.addScreen(eatingPillAnimation);;
+uint8_t eatingPoopAnimationScreenId = stateMachine.addScreen(eatingPoopAnimation);;
+uint8_t eatingLoveAnimationScreenId = stateMachine.addScreen(eatingLoveAnimation);;
 
 
 
 
 void stateMachineInit() {
-  stateMachine.printTransitions();
+
+  //return to main screen after showing eating animation
+  eatingMeatAnimation->setAnimationEndAction([]() {
+    stateMachine.setCurrentScreen(digimonScreenId);
+
+    });
+  eatingPillAnimation->setAnimationEndAction([]() {
+    stateMachine.setCurrentScreen(digimonScreenId);
+
+    });
+  eatingPoopAnimation->setAnimationEndAction([]() {
+    stateMachine.setCurrentScreen(digimonScreenId);
+
+    });
+  eatingLoveAnimation->setAnimationEndAction([]() {
+    stateMachine.setCurrentScreen(digimonScreenId);
+
+    });
+
   // in order to be able to go back to the digimon watching screen
   // we will add a transition from every screen to the digimon watching screen
   //triggered by the backsignal (backbutton)
@@ -166,6 +191,32 @@ void stateMachineInit() {
     foodSelection.nextSelection();
     });
 
+  //adding functionality of buttons in food screen:
+  stateMachine.addTransition(foodSelectionId, foodSelectionId, confirmSignal);
+  stateMachine.addTransitionAction(foodSelectionId, confirmSignal, []() {
+    uint8_t selection = foodSelection.getSelection();
+    switch (selection) {
+    case 0:
+      eatingMeatAnimation->startAnimation();
+      stateMachine.setCurrentScreen(eatingMeatAnimationScreenId);
+      break;
+    case 1:
+      eatingPillAnimation->startAnimation();
+      stateMachine.setCurrentScreen(eatingPillAnimationScreenId);
+      break;
+
+    case 2:
+      eatingLoveAnimation->startAnimation();
+      stateMachine.setCurrentScreen(eatingLoveAnimationScreenId);
+      break;
+    case 3:
+      eatingPoopAnimation->startAnimation();
+      stateMachine.setCurrentScreen(eatingPoopAnimationScreenId);
+      break;
+
+    }
+    });
+
   //adding functionality of buttons in fight screen:
   stateMachine.addTransition(fightSelectionId, fightSelectionId, nextSignal);
   stateMachine.addTransitionAction(fightSelectionId, nextSignal, []() {
@@ -204,6 +255,8 @@ void setupScreens()
   //Positioning of the screens
   int screensOffsetX = 4;
 
+
+  //set offset of the screens
   ageWeightScreen.setPos(screensOffsetX, 0);
   effortScreen.setPos(screensOffsetX, 0);
   strengthScreen.setPos(screensOffsetX, 0);
@@ -212,14 +265,19 @@ void setupScreens()
   sPercentageScreen.setPos(screensOffsetX, 0);
   tPercentageScreen.setPos(screensOffsetX, 0);
   clockScreen.setPos(screensOffsetX, 0);
+  eatingMeatAnimation->setPos(screensOffsetX, 0);
+  eatingPillAnimation->setPos(screensOffsetX, 0);
+  eatingPoopAnimation->setPos(screensOffsetX, 0);
+  eatingLoveAnimation->setPos(screensOffsetX, 0);
 
+
+  //adding the food selection options
   foodSelection.addOption("Meat", SYMBOL_MEAT);
   foodSelection.addOption("PILL", SYMBOL_PILL);
-
   foodSelection.addOption("LOVE", SYMBOL_HEART);
-
   foodSelection.addOption("SHIT", SYMBOL_POOP);
-  //foodSelection.addOption("FOUR", SYMBOL_TRIANGLE);
+
+  //adding the battle options
   fightSelection.setShowIcons(false);
   fightSelection.addOption("SINGLE");
   fightSelection.addOption("TAG");
@@ -245,8 +303,8 @@ void setup(void)
   tft.setRotation(1);
   tft.fillScreen(0x86CE);
 
+//init functions
   button_init();
-
   setupScreens();
   stateMachineInit();
 }
@@ -269,6 +327,16 @@ void loop()
     digimonScreen.randomMoveDigimon();
     clockScreen.incrementSeconds();
     digiNameScreen.scrollText();
+
+    //switch to next frame only when the screen is active
+    if (stateMachine.getCurrentScreen() == eatingMeatAnimation)
+      eatingMeatAnimation->nextFrame();
+    if (stateMachine.getCurrentScreen() == eatingPillAnimation)
+      eatingPillAnimation->nextFrame();
+    if (stateMachine.getCurrentScreen() == eatingPoopAnimation)
+      eatingPoopAnimation->nextFrame();
+    if (stateMachine.getCurrentScreen() == eatingLoveAnimation)
+      eatingLoveAnimation->nextFrame();
   }
 
 
@@ -281,12 +349,11 @@ void loop()
 
   if (debug == true)
   {
+    //here should be debug stuff but its only fps lol
     tft.setTextColor(TFT_BLACK);
     tft.fillRect(0, 0, 100, 10, 0xFFFF);
     tft.drawString(String((1000.0) / lastDelta) + " FPS", 0, 0);
 
-    //tft.drawString(String(ax)+" ax", 0, 20);
-    //tft.drawString(String(selection)+" selection", 0, 30);
   }
 
   btn1.loop();
@@ -296,6 +363,8 @@ void loop()
   lastDelta = t2 - t1;
 }
 
+
+//method to lock the loop in dependence of the time
 boolean fpslock(long delta)
 {
   ticker += delta;

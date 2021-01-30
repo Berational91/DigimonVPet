@@ -89,7 +89,7 @@ void V20::DigimonWatchingScreen::randomMoveDigimon() {
 
   //with probability of 5% make some other moves
   if (randomDecision(probabilityMakeAnotherMove)) {
-    currentWalkSprite = SPRITE_DIGIMON_HAPPY;
+    currentWalkSprite = SPRITE_DIGIMON_ATTACK_1;
   }
 
 

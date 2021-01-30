@@ -36,7 +36,7 @@
 const unsigned short DIGIMON[N_DIGIMON][N_SPRITES_PER_DIGIMON][SPRITES_DIGIMON_RESOLUTION] PROGMEM = {
     {
         //agumon
-        {
+        {//0
             0b0000000000000000,
             0b0000001111100000,
             0b0000010000010000,
@@ -54,7 +54,7 @@ const unsigned short DIGIMON[N_DIGIMON][N_SPRITES_PER_DIGIMON][SPRITES_DIGIMON_R
             0b0010100101010101,
             0b0011111101111111,
         },
-        {
+        {//1
             0b0000000000000000,
             0b0000000000000000,
             0b0000001111100000,
@@ -74,7 +74,7 @@ const unsigned short DIGIMON[N_DIGIMON][N_SPRITES_PER_DIGIMON][SPRITES_DIGIMON_R
         },
 
 
-        {
+        {//2
             0b0000011111100000,
             0b0111100000100000,
             0b1000000110010000,
@@ -93,7 +93,7 @@ const unsigned short DIGIMON[N_DIGIMON][N_SPRITES_PER_DIGIMON][SPRITES_DIGIMON_R
             0b0111111011111110,
         },
 
-           {
+           {//3
             0b0000011111100000,
             0b0111100000100000,
             0b1000000110010000,
@@ -112,8 +112,8 @@ const unsigned short DIGIMON[N_DIGIMON][N_SPRITES_PER_DIGIMON][SPRITES_DIGIMON_R
             0b0111111011111110,
         },
 
-        //ab hier wiederholungen
-        {
+       
+        {//4
             0b0000000000000000,
             0b0000000000000000,
             0b0000011111000000,
@@ -131,7 +131,7 @@ const unsigned short DIGIMON[N_DIGIMON][N_SPRITES_PER_DIGIMON][SPRITES_DIGIMON_R
             0b0101001110101010,
             0b0111111011111110,
         },
-        {
+        {//5
             0b0000000000000000,
             0b0000000000000000,
             0b0000011111000000,
@@ -150,7 +150,26 @@ const unsigned short DIGIMON[N_DIGIMON][N_SPRITES_PER_DIGIMON][SPRITES_DIGIMON_R
             0b0111111011111110,
         },
 
-        {
+         {//6 EATING
+            0b0000011111100000,
+            0b0111100000100000,
+            0b1000000110010000,
+            0b0111001001010000,
+            0b0000100000001000,
+            0b0000100000001000,
+            0b0011100000001000,
+            0b0100000000001000,
+            0b0011111000010000,
+            0b0001100001010000,
+            0b0010100010001000,
+            0b0011100011101000,
+            0b0000110000100100,
+            0b0011001111000100,
+            0b0101001010101010,
+            0b0111111011111110,
+        },
+
+        {//7
             0b0000000000000000,
             0b0000000000000000,
             0b0000001111100000,
@@ -168,7 +187,7 @@ const unsigned short DIGIMON[N_DIGIMON][N_SPRITES_PER_DIGIMON][SPRITES_DIGIMON_R
             0b0010100111010101,
             0b0011111101111111,
         },
-        {
+        {//8
             0b0000000000000000,
             0b0000000000000000,
             0b0000001111100000,
@@ -243,24 +262,7 @@ const unsigned short DIGIMON[N_DIGIMON][N_SPRITES_PER_DIGIMON][SPRITES_DIGIMON_R
             0b0010100111010101,
             0b0011111101111111,
         },
-        {
-            0b0000011111100000,
-            0b0111100000100000,
-            0b1000000110010000,
-            0b0111001100010000,
-            0b0000101100001000,
-            0b0000100000001000,
-            0b0011100000001000,
-            0b0100000000001000,
-            0b0011111000010000,
-            0b0001100001010000,
-            0b0010100010001000,
-            0b0011100011101000,
-            0b0000110000100100,
-            0b0011001111000100,
-            0b0101001010101010,
-            0b0111111011111110,
-        },
+        
 
     }
 
