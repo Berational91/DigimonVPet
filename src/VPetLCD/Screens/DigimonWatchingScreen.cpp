@@ -32,7 +32,18 @@ boolean V20::DigimonWatchingScreen::randomDecision(int percent) {
 void V20::DigimonWatchingScreen::loop(long delta) {
 
   if(isNextFrameTime(delta)){
+    if(isFlushing){
+      if(poopOffsetY<16+8 && numberOfPoop >0){
+        poopOffsetY++;
+      }else{
+        isFlushing = false;
+        poopOffsetY=0;
+        numberOfPoop=0;
+        setUpdateIntervallTime(updateIntervallTime*10);
+      }
+    }else{
     calculateWalking();
+    }
   }
 
 }
@@ -109,16 +120,25 @@ void V20::DigimonWatchingScreen::calculateWalking() {
  * */
 void V20::DigimonWatchingScreen::drawPoop(VPetLCD* lcd) {
   const byte* sprite = spriteManager->getSymbol(SYMBOL_POOP);
+  const byte* flushSprite = spriteManager->getSymbol(SYMBOL_POOPWAVE);
   boolean mirrored = poopAnimationCounter == 1;
   for (int i = 0; i < numberOfPoop; i++) {
 
     if (i % 2 == 0) {
-      lcd->drawByteArray(sprite, poopWidth, poopWidth, screenX + maxX - poopWidth - poopWidth * i / 2, screenY + poopWidth, mirrored, pixelColor);
+      if(isFlushing)
+        lcd->drawByteArray(flushSprite, poopWidth, poopWidth, screenX + maxX - poopWidth - poopWidth * i / 2, screenY - poopWidth+poopOffsetY, mirrored, pixelColor);
+      lcd->drawByteArray(sprite, poopWidth, poopWidth, screenX + maxX - poopWidth - poopWidth * i / 2, screenY + poopWidth+poopOffsetY, mirrored, pixelColor);
     }
     else {
-      lcd->drawByteArray(sprite, poopWidth, poopWidth, screenX + maxX - poopWidth - poopWidth * (i - 1) / 2, screenY, mirrored, pixelColor);
+      lcd->drawByteArray(sprite, poopWidth, poopWidth, screenX + maxX - poopWidth - poopWidth * (i - 1) / 2, screenY+poopOffsetY, mirrored, pixelColor);
     }
   }
+}
+
+void V20::DigimonWatchingScreen::flushPoop(){
+  isFlushing = true;
+  poopOffsetY=0;
+  setUpdateIntervallTime(updateIntervallTime/10); // be careful of updateIntervalltimes which has 10 not as a factor
 }
 
 /**

@@ -160,6 +160,10 @@ void stateMachineInit() {
       stateMachine.setCurrentScreen(fightSelectionId);
       break;
 
+    case 4:
+      digimonScreen.flushPoop();
+      break;
+
     case 2:
       poop++;
       poop %=9;

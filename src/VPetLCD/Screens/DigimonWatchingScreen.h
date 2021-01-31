@@ -37,6 +37,8 @@ namespace V20{
       uint8_t numberOfPoop; //theAmount of poop on the screen
       uint8_t poopWidth = SPRITES_SYMBOL_RESOLUTION; //the width of poop in pixel
       uint8_t poopAnimationCounter;
+      uint8_t poopOffsetY=0; // the offset when flushing
+      boolean isFlushing=false;
       void drawPoop(VPetLCD* lcd);
 
 
@@ -55,6 +57,7 @@ namespace V20{
       void setXLimitations(int8_t _minX, int8_t _maxX){minX = _minX; maxX = _maxX;};
       void setYLimitations(int8_t _minY, int8_t _maxY){minY = _minY; maxY = _maxY;};
       void setNumberOfPoop(uint8_t _numberOfPoop){numberOfPoop=_numberOfPoop;};
+      void flushPoop();
     
   };
 
