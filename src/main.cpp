@@ -177,7 +177,6 @@ void stateMachineInit() {
   //adding functionality of buttons in food screen:
   stateMachine.addTransition(foodSelectionId, foodSelectionId, confirmSignal);
   stateMachine.addTransitionAction(foodSelectionId, confirmSignal, []() {
-    Serial.println("asasasasas");
     uint8_t selection = foodSelection.getSelection();
     switch (selection) {
     case 0:
@@ -209,7 +208,6 @@ void stateMachineInit() {
     stateMachine.addTransition(eatingAnimationScreenId, foodSelectionId, confirmSignal);
     //abort animation
     stateMachine.addTransitionAction(eatingAnimationScreenId, confirmSignal, [](){
-      Serial.println("Casadfasfasdfa");
       eatingAnimationScreen.abortAnimation();
     });
 
