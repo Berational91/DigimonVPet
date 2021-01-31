@@ -106,9 +106,9 @@ uint8_t eatingAnimationScreenId = stateMachine.addScreen(&eatingAnimationScreen)
 
 void stateMachineInit() {
 
-  //return to main screen after showing eating animation
+  //return to food selection screen after showing eating animation
   eatingAnimationScreen.setAnimationEndAction([]() {
-    stateMachine.setCurrentScreen(digimonScreenId);
+    stateMachine.setCurrentScreen(foodSelectionId);
 
     });
 
@@ -177,6 +177,7 @@ void stateMachineInit() {
   //adding functionality of buttons in food screen:
   stateMachine.addTransition(foodSelectionId, foodSelectionId, confirmSignal);
   stateMachine.addTransitionAction(foodSelectionId, confirmSignal, []() {
+    Serial.println("asasasasas");
     uint8_t selection = foodSelection.getSelection();
     switch (selection) {
     case 0:
@@ -202,6 +203,14 @@ void stateMachineInit() {
       break;
 
     }
+    });
+
+    //go back to food selection if pressed confirm again
+    stateMachine.addTransition(eatingAnimationScreenId, foodSelectionId, confirmSignal);
+    //abort animation
+    stateMachine.addTransitionAction(eatingAnimationScreenId, confirmSignal, [](){
+      Serial.println("Casadfasfasdfa");
+      eatingAnimationScreen.abortAnimation();
     });
 
   //adding functionality of buttons in fight screen:
