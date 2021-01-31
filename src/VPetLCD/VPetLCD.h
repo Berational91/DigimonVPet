@@ -86,13 +86,18 @@ class VPetLCD {
         uint16_t pixelColor = 0x0001;
         uint16_t screenX = 0;
         uint16_t screenY = 0;
+        long timeSinceLastUpdate=0; //this is basicaly the timer
+        long updateIntervallTime=500; //this is the time specifiyng how many times per second an update in loop should be done
+        boolean isNextFrameTime(long delta); // true if the last frame is updateIntervallTime ms ago, false if not. adds delta to timeSincelastupdate
       public:
+        void loop(unsigned long delta){};//for time dependent screens like animation/clock etc.; Delta is the calculationtime in ms for the last frame
         virtual void draw(VPetLCD *lcd) = 0;
         void setPixelColor(uint16_t color){pixelColor=color;};
         void setPos(uint16_t x, uint16_t y){screenX = x; screenY = y;};
         uint16_t getPosX(){return screenX;};
         uint16_t getPosY(){return screenY;};
         uint16_t getPixelColor(){return pixelColor;};
+        void setUpdateIntervallTime(long _updateIntervallTime){updateIntervallTime=_updateIntervallTime;};
     };
 
     //Renders the Content of the Virtual LCD according to the Screen Object

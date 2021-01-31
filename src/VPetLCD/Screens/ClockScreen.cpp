@@ -11,8 +11,14 @@
 V20::ClockScreen::ClockScreen(boolean _showAMPM) {
   showAMPM = _showAMPM;
   isSetMode = false;
+  setUpdateIntervallTime(1000);
 }
 
+void V20::ClockScreen::loop(unsigned long delta ){
+  if (isNextFrameTime(delta)){
+    incrementSeconds();
+  }
+}
 
 void V20::ClockScreen::incrementSeconds() {
 

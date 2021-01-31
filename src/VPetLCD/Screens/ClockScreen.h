@@ -20,15 +20,17 @@ namespace V20 {
     uint8_t seconds;
     boolean showAMPM;
     boolean isSetMode;
-
+    
+    void incrementSeconds();
 
   public:
     ClockScreen(boolean _showAMPM);
+    void loop(unsigned long delta);
     void setHours(uint8_t _hours) { hours = _hours; }
     void setMinutes(uint8_t _minutes) { minutes = _minutes; }
     void setSeconds(uint8_t _seconds) { seconds = _seconds; }
 
-    void incrementSeconds();
+ 
 
     void draw(VPetLCD* lcd);
 

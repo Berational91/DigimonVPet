@@ -135,3 +135,11 @@ else {
   }
 
 }
+
+
+void V20::DigimonNameScreen::loop(unsigned long delta){
+  if ( isNextFrameTime(delta) ){
+    scrollText();
+  }
+
+}

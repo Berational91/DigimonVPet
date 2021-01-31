@@ -27,7 +27,7 @@ void VPetLCD::drawMenuItem(uint16_t index, int16_t x, int16_t y, uint16_t scale,
   //which has one 1 entry, which is shifted every iteration until the whole
   // image is restored
 
-  const uint32_t *sprite = spriteManager->getHighResMenuItem(index);
+  const uint32_t* sprite = spriteManager->getHighResMenuItem(index);
 
   for (int currentY = 0; currentY < SPRITES_MENU_RESOLUTION; currentY++) {
     //initializing mask to read pixel out of the integer
@@ -92,7 +92,7 @@ void VPetLCD::drawByteArray(const byte toDraw[], uint16_t spriteWidth, uint16_t 
  * This function draws the Top/Bottom Menu of the VPET LCD
  */
 void VPetLCD::drawMenu() {
-  if(menuBar != NULL){
+  if (menuBar != NULL) {
     menuBar->drawMenu(this);
   }
 }
@@ -448,7 +448,24 @@ VPetLCD::VPetLCD(AbstractDisplayAdapter* displayAdapter, AbstractSpriteManager* 
 }
 
 
-void VPetLCD::setMenuBar(VPetLCDMenuBar32p* _menuBar){
-    menuBar =_menuBar;
-    this->lcdY = menuBar->getBarHeight();
-  };
+void VPetLCD::setMenuBar(VPetLCDMenuBar32p* _menuBar) {
+  menuBar = _menuBar;
+  this->lcdY = menuBar->getBarHeight();
+};
+
+
+/**
+ * adds delta to timeSincelastupdate and returns true if updateIntervallTime is exceeded
+ *@returns true if the last frame is updateIntervallTime ms ago, false if not. 
+ * */
+boolean VPetLCD::Screen::isNextFrameTime(long delta) {
+
+  timeSinceLastUpdate += delta;
+  if (timeSinceLastUpdate > updateIntervallTime)
+  {
+    timeSinceLastUpdate %= updateIntervallTime;
+    return true;
+  }
+  return false;
+
+}

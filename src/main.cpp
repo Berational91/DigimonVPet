@@ -27,7 +27,7 @@
 
 #include <TFT_eSPI.h>
 #include "Button2.h"
-
+#include <Arduino.h>
 
 
 #define ADC_EN 14 //ADC_EN is the ADC detection enable port
@@ -38,17 +38,6 @@
 Button2 btn1(BUTTON_1);
 Button2 btn2(BUTTON_2);
 
-//method for being fps independent
-boolean fpslock(long delta);
-
-boolean debug = false;
-
-uint32_t menuSelection = 0;
-int numberOfMenuEntries = 5;
-
-uint8_t menuFoodSelection = 0;
-uint8_t menuFoodSelectionMax = 4;
-
 int hours = 23;
 int minutes = 59;
 int seconds = 0;
@@ -58,11 +47,18 @@ boolean buttonPressed = false;
 int displayHeight = 240;
 int displayWidth = 135;
 
+
+//TFT_eSPI-Only stuff
 TFT_eSPI tft = TFT_eSPI(displayWidth, displayHeight); // Create object "tft"
 TFT_eSprite img = TFT_eSprite(&tft);                  // Create Sprite object "img" with pointer to "tft" object
 TFT_eSPI_DisplayAdapter displayAdapter(&img, displayHeight, displayWidth);         //create a DisplayAdapter for VPetLCD class
-ESP32SpriteManager spriteManager;
+//--------
 
+//ESP32 Only stuff
+ESP32SpriteManager spriteManager;
+//
+
+//Creating all instances for the UI
 VPetLCD screen(&displayAdapter, &spriteManager, 40, 16);
 VPetLCDMenuBar32p menuBar(7,5,displayHeight);
 
@@ -82,12 +78,15 @@ V20::EatingAnimationScreen eatingAnimationScreen(&spriteManager, DIGIMON_AGUMON)
 
 //13 screens and 3 signals (one for each button)
 uint8_t numberOfScreens = 13;
+uint8_t numberOfSignals = 3;
 
 uint8_t confirmSignal = 0;
 uint8_t nextSignal = 1;
 uint8_t backSignal = 2;
 
-ScreenStateMachine stateMachine(numberOfScreens, 3);
+//Creating the ScreenStateMachine, which handles transitions between screens
+//and the actions of the buttons; the buttons are just sending signals to the statemachine
+ScreenStateMachine stateMachine(numberOfScreens, numberOfSignals);
 
 uint8_t digimonScreenId = stateMachine.addScreen(&digimonScreen);
 uint8_t digiNameScreenId = stateMachine.addScreen(&digiNameScreen);
@@ -103,8 +102,7 @@ uint8_t fightSelectionId = stateMachine.addScreen(&fightSelection);
 uint8_t clockScreenId = stateMachine.addScreen(&clockScreen);
 uint8_t eatingAnimationScreenId = stateMachine.addScreen(&eatingAnimationScreen);
 
-
-
+uint8_t poop=0;
 
 void stateMachineInit() {
 
@@ -113,7 +111,6 @@ void stateMachineInit() {
     stateMachine.setCurrentScreen(foodSelectionId);
 
     });
-
 
   // in order to be able to go back to the digimon watching screen
   // we will add a transition from every screen to the digimon watching screen
@@ -150,7 +147,6 @@ void stateMachineInit() {
   //Here are the conditional transitions handled.
   stateMachine.addTransition(digimonScreenId, digimonScreenId, confirmSignal);
   stateMachine.addTransitionAction(digimonScreenId, confirmSignal, []() {
-    Serial.print(menuSelection);
     switch (menuBar.getSelection()) {
     case 0:
       stateMachine.setCurrentScreen(digiNameScreenId);
@@ -162,6 +158,12 @@ void stateMachineInit() {
     case 3:
       fightSelection.setSelection(0);
       stateMachine.setCurrentScreen(fightSelectionId);
+      break;
+
+    case 2:
+      poop++;
+      poop %=9;
+      digimonScreen.setNumberOfPoop(poop);
       break;
     }
     });
@@ -216,6 +218,7 @@ void stateMachineInit() {
     fightSelection.nextSelection();
 
     });
+
 
 
 }
@@ -313,31 +316,28 @@ void setup(void)
 unsigned long ticker = 0;
 unsigned long tickerResetValue = 1000;
 unsigned long lastDelta = 0;
-
+float getFragmentation() ;
+boolean debug=true;
 void loop()
 {
 
   //tft.fillScreen(0x86CE);
   unsigned long t1 = millis();
 
-  boolean locked = fpslock(lastDelta);
-
-  if (!locked)
-  {
-    digimonScreen.randomMoveDigimon();
-    clockScreen.incrementSeconds();
-    digiNameScreen.scrollText();
-
-    //switch to next frame only when the screen is active
-    if (stateMachine.getCurrentScreen() == &eatingAnimationScreen)
-      eatingAnimationScreen.nextFrame();
-  }
 
 
-  if (!locked || buttonPressed || true)
-  {
-    screen.renderScreen(stateMachine.getCurrentScreen());
-  }
+  //updating the screens which need the loop
+  digimonScreen.loop(lastDelta);
+  clockScreen.loop(lastDelta);
+  digiNameScreen.loop(lastDelta);
+
+
+  //switch to next frame only when the screen is active
+  if (stateMachine.getCurrentScreen() == &eatingAnimationScreen)
+    eatingAnimationScreen.nextFrame();
+  
+  screen.renderScreen(stateMachine.getCurrentScreen());
+  
 
   buttonPressed = false;
 
@@ -345,9 +345,10 @@ void loop()
   {
     //here should be debug stuff but its only fps lol
     tft.setTextColor(TFT_BLACK);
-    tft.fillRect(0, 0, 100, 10, 0xFFFF);
+    tft.fillRect(0, 0, 100, 20, 0xFFFF);
     tft.drawString(String((1000.0) / lastDelta) + " FPS", 0, 0);
-
+    tft.drawString( "Fragmentation: "+String(getFragmentation()) , 0, 10);
+  
   }
 
   btn1.loop();
@@ -358,14 +359,10 @@ void loop()
 }
 
 
-//method to lock the loop in dependence of the time
-boolean fpslock(long delta)
-{
-  ticker += delta;
-  if (ticker > tickerResetValue)
-  {
-    ticker = 0;
-    return false;
-  }
-  return true;
+
+
+//measure the HeapFragmentation
+float getFragmentation() {
+  
+  return 100 - heap_caps_get_largest_free_block(MALLOC_CAP_8BIT) * 100.0 / heap_caps_get_free_size(MALLOC_CAP_8BIT);
 }

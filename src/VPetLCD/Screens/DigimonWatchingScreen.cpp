@@ -7,7 +7,7 @@
 #include "DigimonWatchingScreen.h"
 #include <Arduino.h>
 
-V20::DigimonWatchingScreen::DigimonWatchingScreen(AbstractSpriteManager* _spriteManager,uint8_t digimonSpritesIndex, int8_t _minX, int8_t _maxX, int8_t _minY, int8_t _maxY) {
+V20::DigimonWatchingScreen::DigimonWatchingScreen(AbstractSpriteManager* _spriteManager, uint8_t digimonSpritesIndex, int8_t _minX, int8_t _maxX, int8_t _minY, int8_t _maxY) {
   setXLimitations(_minX, _maxX); // -8 32
   setYLimitations(_minY, _maxY);
   digimonX = 8;
@@ -19,6 +19,9 @@ V20::DigimonWatchingScreen::DigimonWatchingScreen(AbstractSpriteManager* _sprite
   probabilityMoveVertical = 25;
   probabilityMakeAnotherMove = 5;
   spriteManager = _spriteManager;
+  numberOfPoop = 0;
+  poopAnimationCounter = 0;
+  updateIntervallTime = 500;
 }
 
 
@@ -26,10 +29,18 @@ boolean V20::DigimonWatchingScreen::randomDecision(int percent) {
   return percent > random(0, 100);
 }
 
-void V20::DigimonWatchingScreen::randomMoveDigimon() {
-  //those magic numbers -8 32 and 40 are the displays borders
-  // the 
-  if (randomDecision(probabilityChangeDirection) || digimonX < minX || digimonX > maxX) {
+void V20::DigimonWatchingScreen::loop(long delta) {
+
+  if(isNextFrameTime(delta)){
+    calculateWalking();
+  }
+
+}
+
+
+void V20::DigimonWatchingScreen::calculateWalking() {
+
+  if (randomDecision(probabilityChangeDirection) || digimonX < minX || digimonX > maxX - numberOfPoop * poopWidth) {
     looksLeft = !looksLeft;
   }
 
@@ -72,12 +83,12 @@ void V20::DigimonWatchingScreen::randomMoveDigimon() {
     }
     else {
       looksLeft = !looksLeft;
-      if (digimonX < maxX - 1)
+      if (digimonX < maxX - 1 - numberOfPoop * poopWidth)
         digimonX++;
     }
   }
   else {
-    if (digimonX < maxX - 1) {
+    if (digimonX < maxX - 1 - numberOfPoop * poopWidth) {
       digimonX++;
     }
     else {
@@ -91,12 +102,38 @@ void V20::DigimonWatchingScreen::randomMoveDigimon() {
   if (randomDecision(probabilityMakeAnotherMove)) {
     currentWalkSprite = SPRITE_DIGIMON_ATTACK_1;
   }
-
-
 }
 
+/**
+ * draws the poop
+ * */
+void V20::DigimonWatchingScreen::drawPoop(VPetLCD* lcd) {
+  const byte* sprite = spriteManager->getSymbol(SYMBOL_POOP);
+  boolean mirrored = poopAnimationCounter == 1;
+  for (int i = 0; i < numberOfPoop; i++) {
+
+    if (i % 2 == 0) {
+      lcd->drawByteArray(sprite, poopWidth, poopWidth, screenX + maxX - poopWidth - poopWidth * i / 2, screenY + poopWidth, mirrored, pixelColor);
+    }
+    else {
+      lcd->drawByteArray(sprite, poopWidth, poopWidth, screenX + maxX - poopWidth - poopWidth * (i - 1) / 2, screenY, mirrored, pixelColor);
+    }
+  }
+}
+
+/**
+ * Draws the digimon Walking
+ * */
+void V20::DigimonWatchingScreen::drawWakedUp(VPetLCD* lcd) {
+  const unsigned short* sprite = spriteManager->getDigimonSprite(digimonSpritesIndex, currentWalkSprite);
+  lcd->draw16BitArray(sprite, screenX + digimonX, screenY + digimonY, !looksLeft, pixelColor);
+}
+
+/**
+ * draws the screen
+ * */
 void V20::DigimonWatchingScreen::draw(VPetLCD* lcd) {
-  const unsigned short *sprite = spriteManager->getDigimonSprite(digimonSpritesIndex, currentWalkSprite);
-  lcd->draw16BitArray(sprite, digimonX, digimonY, !looksLeft, pixelColor);
+  drawPoop(lcd);
+  drawWakedUp(lcd);
 }
 

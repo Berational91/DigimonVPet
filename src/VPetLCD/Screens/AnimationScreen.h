@@ -31,7 +31,7 @@ namespace V20 {
 
 
   public:
-
+    void loop(long delta);
     AnimationScreen(AbstractSpriteManager *_spriteManager, uint16_t _digimonSpriteIndex, uint8_t _numberOfFrames);
     boolean addFrame(std::function<void(VPetLCD* lcd, AnimationScreen* context)> frame);
     void draw(VPetLCD *lcd);
