@@ -318,12 +318,12 @@ unsigned long tickerResetValue = 1000;
 unsigned long lastDelta = 0;
 float getFragmentation() ;
 boolean debug=true;
+
 void loop()
 {
 
   //tft.fillScreen(0x86CE);
   unsigned long t1 = millis();
-
 
 
   //updating the screens which need the loop
@@ -334,7 +334,7 @@ void loop()
 
   //switch to next frame only when the screen is active
   if (stateMachine.getCurrentScreen() == &eatingAnimationScreen)
-    eatingAnimationScreen.nextFrame();
+    eatingAnimationScreen.loop(lastDelta);
   
   screen.renderScreen(stateMachine.getCurrentScreen());
   
