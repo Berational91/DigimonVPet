@@ -28,14 +28,14 @@ namespace V20 {
 
     uint32_t frameDurationMillis;
     uint32_t timer;
-
+    void nextFrame();
 
   public:
-    void loop(long delta);
+    void loop(unsigned long delta);
     AnimationScreen(AbstractSpriteManager *_spriteManager, uint16_t _digimonSpriteIndex, uint8_t _numberOfFrames);
     boolean addFrame(std::function<void(VPetLCD* lcd, AnimationScreen* context)> frame);
     void draw(VPetLCD *lcd);
-    void nextFrame();
+ 
     void setAnimationEndAction(std::function<void(void)> _animationEndAction);
     AbstractSpriteManager* getSpriteManager(){return spriteManager;};
     uint16_t getDigimonSpriteIndex(){ return digimonSpriteIndex;};

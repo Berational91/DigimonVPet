@@ -58,6 +58,16 @@ void V20::AnimationScreen::nextFrame() {
     }
 }
 
+/**
+ * This method calls the nextFrame() method when the updateIntervallTime is reached
+ * When you call this Method while the last frame, the animationEndAction function will be called
+ * */
+void V20::AnimationScreen::loop(unsigned long delta){
+    if(isNextFrameTime(delta)){
+        nextFrame();
+    }
+}
+
 void V20::AnimationScreen::setAnimationEndAction(std::function<void(void)> _animationEndAction) {
     animationEndAction = _animationEndAction;
 }
