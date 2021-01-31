@@ -5,8 +5,6 @@
   Created by Berat Özdemir, January 16 , 2021.
 */
 /////////////////////////////////////////////////////////////////
-#pragma once
-
 #ifndef VPetLCD_h
 #define VPetLCD_h
 ////////////////////////////////////////////////////////////////
@@ -17,6 +15,8 @@
 
 #define SPRITES_DIGIMON_RESOLUTION 16
 
+//forward declaration of vpetLCDMenu
+class VPetLCDMenuBar32p;
 
 class VPetLCD {
 
@@ -26,15 +26,13 @@ class VPetLCD {
     AbstractDisplayAdapter *canvas;
     AbstractSpriteManager *spriteManager;
 
+    VPetLCDMenuBar32p *menuBar;
 
     uint16_t lcdWidth;
     uint16_t lcdHeight;
     uint16_t lcdX;
     uint16_t lcdY;
     uint16_t lcdScale;
-
-
-    int16_t selectedMenuItem;
 
     uint16_t transparencyColor = 0;
     uint16_t backgroundColor = 0x86CE;
@@ -104,11 +102,8 @@ class VPetLCD {
         endRendering();
     }
 
+    void setMenuBar(VPetLCDMenuBar32p* _menuBar);
 
-    // Set the Selected Menu Item (The Menu will be separated into an own Class)
-    void setSelectedMenuItemIndex(int16_t index) {
-      selectedMenuItem = index;
-    }
 
 
 };

@@ -2,6 +2,7 @@
 #include "ImageData/SymbolData.h"
 #include "ImageData/DigimonSprites.h"
 #include "ImageData/LettersAndDigits.h"
+#include "ImageData/HighResMenuItems.h"
 #include <Arduino.h>
 
 

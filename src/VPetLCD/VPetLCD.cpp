@@ -6,7 +6,7 @@
 */
 /////////////////////////////////////////////////////////////////
 #include "VPetLCD.h"
-
+#include "VPetLCDMenuBar32p.h"
 
 /**
    This Function draws the Menu icon selected by the index on the actual screen (not the simulated LCD)
@@ -92,18 +92,8 @@ void VPetLCD::drawByteArray(const byte toDraw[], uint16_t spriteWidth, uint16_t 
  * This function draws the Top/Bottom Menu of the VPET LCD
  */
 void VPetLCD::drawMenu() {
-
-  for (int i = 0; i < 5; i++) {
-    //this is the offset to fill the gaps between the icons
-    int offset = 20;
-
-    this->drawMenuItem(i, i * SPRITES_MENU_RESOLUTION + offset * i, 0, 1, false, lcdInprintColor);
-  }
-
-  if (selectedMenuItem > -1 && selectedMenuItem < 10) {
-    int offset = 2;
-    int offsetx = 20;
-    this->drawMenuItem(selectedMenuItem, selectedMenuItem * 32 + offset + offsetx * selectedMenuItem, offset, 1, false, lcdSelectionColor);
+  if(menuBar != NULL){
+    menuBar->drawMenu(this);
   }
 }
 
@@ -449,13 +439,16 @@ VPetLCD::VPetLCD(AbstractDisplayAdapter* displayAdapter, AbstractSpriteManager* 
   this->lcdWidth = lcdWidth;
   spriteManager = _spriteManager;
   this->lcdX = 0;
-  this->lcdY = SPRITES_MENU_RESOLUTION;
+  this->lcdY = 0;
 
   this->lcdScale = 6;
-  this->selectedMenuItem = -1;
 
   canvas->createCanvas();
   canvas->setColorDepth(16);
 }
 
 
+void VPetLCD::setMenuBar(VPetLCDMenuBar32p* _menuBar){
+    menuBar =_menuBar;
+    this->lcdY = menuBar->getBarHeight();
+  };

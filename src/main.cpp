@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////////////////////
 
 #include "VPetLCD/VPetLCD.h"
+#include "VPetLCD/VPetLCDMenuBar32p.h"
 #include "VPetLCD/Screens/AgeWeightScreen.h"
 #include "VPetLCD/Screens/DigimonNameScreen.h"
 #include "VPetLCD/Screens/HeartsScreen.h"
@@ -63,6 +64,7 @@ TFT_eSPI_DisplayAdapter displayAdapter(&img, displayHeight, displayWidth);      
 ESP32SpriteManager spriteManager;
 
 VPetLCD screen(&displayAdapter, &spriteManager, 40, 16);
+VPetLCDMenuBar32p menuBar(7,5,displayHeight);
 
 V20::DigimonWatchingScreen digimonScreen(&spriteManager, DIGIMON_AGUMON, -8, 40, 0, 0);
 V20::DigimonNameScreen digiNameScreen(&spriteManager, "Agumon", DIGIMON_AGUMON, 24);
@@ -142,17 +144,14 @@ void stateMachineInit() {
   //if nextSignal is sent (nextbutton pressed), the menuselection will be
   //incremented and the selection will be set
   stateMachine.addTransitionAction(digimonScreenId, nextSignal, []() {
-
-    menuSelection++;
-    menuSelection %= numberOfMenuEntries;
-    screen.setSelectedMenuItemIndex(menuSelection);
+      menuBar.nextSelection();
     });
 
   //Here are the conditional transitions handled.
   stateMachine.addTransition(digimonScreenId, digimonScreenId, confirmSignal);
   stateMachine.addTransitionAction(digimonScreenId, confirmSignal, []() {
     Serial.print(menuSelection);
-    switch (menuSelection) {
+    switch (menuBar.getSelection()) {
     case 0:
       stateMachine.setCurrentScreen(digiNameScreenId);
       break;
@@ -242,7 +241,16 @@ void button_init()
 
 void setupScreens()
 {
-  screen.setSelectedMenuItemIndex(menuSelection);
+  menuBar.setIconOnIndex(0,0);
+  menuBar.setIconOnIndex(1,1);
+  menuBar.setIconOnIndex(2,2);
+  menuBar.setIconOnIndex(3,3);
+  menuBar.setIconOnIndex(4,4);
+  menuBar.setIconOnIndex(5,5);
+  menuBar.setIconOnIndex(6,6);
+
+
+  screen.setMenuBar(&menuBar);
   screen.setLCDPos(0, 32);
   screen.setLcdScale(6);
 
