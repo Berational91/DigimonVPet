@@ -77,6 +77,12 @@ boolean ScreenStateMachine::addTransition(uint8_t screenId1, uint8_t screenId2, 
     }
 }
 
+
+/**
+ * The given lambdaFunction transitionAction will be performed, when a transition from screen screenId1 is triggered by signal signalId
+ * 
+ * @returns true if transistion is added, false if not
+ * */
 boolean ScreenStateMachine::addTransitionAction(uint8_t screenId1, uint8_t signalId, std::function<void(void)> transitionAction) {
     if (signalId < numberOfSignals) {
         transitionActions[getIndex(screenId1)][signalId] = transitionAction;
@@ -105,8 +111,9 @@ void ScreenStateMachine::printTransitions(){
 
 
 /**
- * Triggers a transition from the current state to another state defined by the added transitions.
- *
+ * Triggers a transition from the current state to another state defined by the added transitions. 
+ * If for the current screen and given signal is an transitionAction is defined, it will be performed.
+ * 
  * @param signalId the id of the triggering signal
  *
  * @return true if any transition was performed, false if signalId was bad or no transition from the current screen triggered by given signal was defined
@@ -119,15 +126,15 @@ boolean ScreenStateMachine::sendSignal(uint8_t signalId) {
     }
 
     uint8_t nextScreenId = transitions[getIndex(currentScreenId)][signalId];
-    
+    uint8_t oldCurrentScreenId = currentScreenId;
     if (nextScreenId > 0) {
 
 
         currentScreenId = nextScreenId;
 
         //call transitionAction function if defined
-        if( transitionActions[getIndex(currentScreenId)][signalId] != NULL){
-            transitionActions[getIndex(currentScreenId)][signalId]();
+        if( transitionActions[getIndex(oldCurrentScreenId)][signalId] != NULL){
+            transitionActions[getIndex(oldCurrentScreenId)][signalId]();
         }
     }    
 else {
