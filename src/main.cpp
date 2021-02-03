@@ -193,9 +193,7 @@ void stateMachineInit() {
       break;
 
     case 2:
-      poop++;
-      poop %=9;
-      digimonScreen.setNumberOfPoop(poop);
+
       break;
     }
     });
