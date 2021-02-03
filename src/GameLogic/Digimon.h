@@ -1,6 +1,11 @@
 #pragma once
 #include <Arduino.h>
 
+#define N_EVOLUTIONS 1 //the maximal evolution options per digimon
+#define N_DIGIMON 3
+#define DIGIMON_AGUMON 0
+#define DIGIMON_KOROMON 1
+#define DIGIMON_BOTAMON 2
 
 #define TYPE_VACCINE 0
 #define TYPE_DATA 1
@@ -23,6 +28,12 @@
 #define POOP_FREQUENCY_PERFECT 60*80
 #define POOP_FREQUENCY_ULTIMATE 60*100
 
+#define EVOLUTION_TIME_BABY1 60*10 //Baby1->Baby2 takes 10 minutes
+#define EVOLUTION_TIME_BABY2 60*60*6 // Baby2->rookie takes 6 hours
+#define EVOLUTION_TIME_ROOKIE 60*60*24 // Rookie->adult takes 24 hours
+#define EVOLUTION_TIME_ADULT 60*60*36 
+#define EVOLUTION_TIME_PERFECT 60*60*48
+
 struct DigimonProperties {
     char* digiName; //Name of the Digimon
     uint8_t stage; //baby rookie adult etc.
@@ -36,6 +47,7 @@ struct DigimonProperties {
     unsigned long evolutionTimeSec; //time it takes to evolve in seconds
     uint8_t type; // Va Da Vi
     uint8_t og_slot; // slot for battles in og mode
+    uint16_t evolutionOptions; // how many possible evolutions there are in the evolution data array in progmem
 };
 
 
@@ -60,6 +72,27 @@ struct NormalEvolutionData {
     boolean careBattledWith;
     uint16_t battledWithDigimonId;
 };
+
+
+const DigimonProperties DIGIMON_DATA[N_DIGIMON] PROGMEM = {
+    {"Agumon",STAGE_ROOKIE,20,24,20,19,8,POOP_FREQUENCY_ROOKIE,EVOLUTION_TIME_ROOKIE,TYPE_DATA,0x03,0},
+    {"Koromon",STAGE_BABY2,10,16,0 ,19,8,POOP_FREQUENCY_BABY2,EVOLUTION_TIME_BABY2,TYPE_DATA,0x03,1},
+    {"Botamon",STAGE_BABY1,5 ,4 ,0 ,19,8,POOP_FREQUENCY_BABY1,EVOLUTION_TIME_BABY1 ,TYPE_DATA,0x03,1},
+
+};
+
+const NormalEvolutionData NORMALEVOLUTIONDATA[N_DIGIMON][N_EVOLUTIONS] PROGMEM = {
+    //Agumons Digitations
+    {NULL},
+
+    //Koromons Digitations
+    {{DIGIMON_AGUMON, true,0,2,false,0,0,false,0,0,false,0,0,false,0}},
+
+    //Botamons Digitations
+    {{DIGIMON_KOROMON, false,0,0,false,0,0,false,0,0,false,0,0,false,0}},
+};
+
+
 
 class Digimon{
 
