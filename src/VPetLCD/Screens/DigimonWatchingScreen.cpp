@@ -128,7 +128,7 @@ void V20::DigimonWatchingScreen::drawPoop(VPetLCD* lcd) {
   const byte* sprite = spriteManager->getSymbol(SYMBOL_POOP);
   const byte* flushSprite = spriteManager->getSymbol(SYMBOL_POOPWAVE);
   boolean mirrored = poopAnimationCounter == 1;
-  boolean numPoop = max(numberOfPoopWhileFlushing, numberOfPoop); //numberOfPoop is 0 right before/after flush begun
+  uint8_t numPoop = max(numberOfPoopWhileFlushing, numberOfPoop); //numberOfPoop is 0 right before/after flush begun
 
   for (int i = 0; i < numPoop; i++) {
 
