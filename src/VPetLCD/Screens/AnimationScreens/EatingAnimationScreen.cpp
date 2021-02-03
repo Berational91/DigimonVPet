@@ -14,7 +14,7 @@ namespace V20 {
         EatingAnimationScreen *eContext = (EatingAnimationScreen*) (context);
         uint8_t foodFullSpriteIndex = eContext->getFullSpriteIndex() ;
 
-        const unsigned short* digiSprite = sm->getDigimonSprite(digiIndex, SPRITE_DIGIMON_WALK_0);
+        const unsigned short* digiSprite = sm->getDigimonSprite(digiIndex, SPRITE_DIGIMON_EATING1);
         const byte* foodSprite = sm->getSymbol(foodFullSpriteIndex);
         uint16_t screenX = context->getPosX();
         uint16_t screenY = context->getPosY();
@@ -36,7 +36,7 @@ namespace V20 {
         EatingAnimationScreen *eContext = (EatingAnimationScreen*) (context);
         uint8_t foodFullSpriteIndex = eContext->getFullSpriteIndex() ;
 
-        const unsigned short* digiSprite = sm->getDigimonSprite(digiIndex, SPRITE_DIGIMON_EATING);
+        const unsigned short* digiSprite = sm->getDigimonSprite(digiIndex, SPRITE_DIGIMON_EATING2);
         const byte* foodSprite = sm->getSymbol(foodFullSpriteIndex);
 
         uint16_t screenX = context->getPosX();
@@ -54,7 +54,7 @@ namespace V20 {
         AbstractSpriteManager* sm = context->getSpriteManager();
         uint16_t pixelColor = context->getPixelColor();
         uint16_t digiIndex = context->getDigimonSpriteIndex();
-        const unsigned short* digiSprite = sm->getDigimonSprite(digiIndex, SPRITE_DIGIMON_WALK_0);
+        const unsigned short* digiSprite = sm->getDigimonSprite(digiIndex, SPRITE_DIGIMON_EATING1);
         EatingAnimationScreen *eContext = (EatingAnimationScreen*)(context);
         uint8_t foodHalfSpriteIndex = eContext->getHalfSpriteIndex() ;
 
@@ -74,7 +74,7 @@ namespace V20 {
         AbstractSpriteManager* sm = context->getSpriteManager();
         uint16_t pixelColor = context->getPixelColor();
         uint16_t digiIndex = context->getDigimonSpriteIndex();
-        const unsigned short* digiSprite = sm->getDigimonSprite(digiIndex, SPRITE_DIGIMON_EATING);
+        const unsigned short* digiSprite = sm->getDigimonSprite(digiIndex, SPRITE_DIGIMON_EATING2);
         EatingAnimationScreen *eContext = (EatingAnimationScreen*) (context);
         uint8_t foodHalfSpriteIndex = eContext->getHalfSpriteIndex() ;
 
@@ -94,7 +94,7 @@ namespace V20 {
         AbstractSpriteManager* sm = context->getSpriteManager();
         uint16_t pixelColor = context->getPixelColor();
         uint16_t digiIndex = context->getDigimonSpriteIndex();
-        const unsigned short* digiSprite = sm->getDigimonSprite(digiIndex, SPRITE_DIGIMON_WALK_0);
+        const unsigned short* digiSprite = sm->getDigimonSprite(digiIndex, SPRITE_DIGIMON_EATING1);
         EatingAnimationScreen *eContext = (EatingAnimationScreen*)(context);
         uint8_t foodEmptySpriteIndex = eContext->getEmptySpriteIndex() ;
 

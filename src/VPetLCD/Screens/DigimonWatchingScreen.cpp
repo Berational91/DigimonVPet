@@ -7,7 +7,7 @@
 #include "DigimonWatchingScreen.h"
 #include <Arduino.h>
 
-V20::DigimonWatchingScreen::DigimonWatchingScreen(AbstractSpriteManager* _spriteManager, uint8_t digimonSpritesIndex, int8_t _minX, int8_t _maxX, int8_t _minY, int8_t _maxY) {
+V20::DigimonWatchingScreen::DigimonWatchingScreen(AbstractSpriteManager* _spriteManager, uint8_t _digimonSpritesIndex, int8_t _minX, int8_t _maxX, int8_t _minY, int8_t _maxY) {
   setXLimitations(_minX, _maxX); // -8 32
   setYLimitations(_minY, _maxY);
   digimonX = 8;
@@ -22,6 +22,7 @@ V20::DigimonWatchingScreen::DigimonWatchingScreen(AbstractSpriteManager* _sprite
   numberOfPoop = 0;
   poopAnimationCounter = 0;
   updateIntervallTime = 500;
+  digimonSpritesIndex=_digimonSpritesIndex;
 }
 
 
@@ -32,16 +33,21 @@ boolean V20::DigimonWatchingScreen::randomDecision(int percent) {
 void V20::DigimonWatchingScreen::loop(long delta) {
 
   if(isNextFrameTime(delta)){
+
+
     if(isFlushing){
-      if(poopOffsetY<16+8 && numberOfPoop >0){
+      if(poopOffsetY<16+8){
         poopOffsetY++;
       }else{
         isFlushing = false;
         poopOffsetY=0;
         numberOfPoop=0;
+        numberOfPoopWhileFlushing=0;
         setUpdateIntervallTime(updateIntervallTime*10);
       }
     }else{
+    poopAnimationCounter++;
+    poopAnimationCounter%=2;
     calculateWalking();
     }
   }
@@ -111,7 +117,7 @@ void V20::DigimonWatchingScreen::calculateWalking() {
 
   //with probability of 5% make some other moves
   if (randomDecision(probabilityMakeAnotherMove)) {
-    currentWalkSprite = SPRITE_DIGIMON_ATTACK_1;
+    currentWalkSprite = SPRITE_DIGIMON_HAPPY;
   }
 }
 
@@ -122,7 +128,9 @@ void V20::DigimonWatchingScreen::drawPoop(VPetLCD* lcd) {
   const byte* sprite = spriteManager->getSymbol(SYMBOL_POOP);
   const byte* flushSprite = spriteManager->getSymbol(SYMBOL_POOPWAVE);
   boolean mirrored = poopAnimationCounter == 1;
-  for (int i = 0; i < numberOfPoop; i++) {
+  boolean numPoop = max(numberOfPoopWhileFlushing, numberOfPoop); //numberOfPoop is 0 right before/after flush begun
+
+  for (int i = 0; i < numPoop; i++) {
 
     if (i % 2 == 0) {
       if(isFlushing)
@@ -136,9 +144,12 @@ void V20::DigimonWatchingScreen::drawPoop(VPetLCD* lcd) {
 }
 
 void V20::DigimonWatchingScreen::flushPoop(){
-  isFlushing = true;
-  poopOffsetY=0;
-  setUpdateIntervallTime(updateIntervallTime/10); // be careful of updateIntervalltimes which has 10 not as a factor
+  if(numberOfPoop > 0){
+    numberOfPoopWhileFlushing=numberOfPoop;
+    isFlushing = true;
+    poopOffsetY=0;
+    setUpdateIntervallTime(updateIntervallTime/10); // be careful of updateIntervalltimes which has 10 not as a factor
+  }
 }
 
 /**

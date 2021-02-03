@@ -19,11 +19,21 @@
 #include "VPetLCD/Screens/DigimonWatchingScreen.h"
 #include "VPetLCD/Screens/AnimationScreens/EatingAnimationScreen.h"
 
+
 #include "GameLogic/ScreenStateMachine.h"
+
+#include "GameLogic/Digimon.h"
+#include "SaveGame/SaveGameHandler.h"
+
+
+SaveGameHandler savegame;
+uint16_t digiIndex =DIGIMON_BOTAMON;
+Digimon digimon(digiIndex);
 
 //ESP32 Specific stuff
 #include "VPetLCD/DisplayAdapter/TFT_eSPI_Displayadapter.h"
 #include "VPetLCD/ESP32SpriteManager.h"
+#include "GameLogic/ESP32DigimonDataLoader.h"
 
 #include <TFT_eSPI.h>
 #include "Button2.h"
@@ -56,14 +66,15 @@ TFT_eSPI_DisplayAdapter displayAdapter(&img, displayHeight, displayWidth);      
 
 //ESP32 Only stuff
 ESP32SpriteManager spriteManager;
+ESP32DigimonDataLoader dataLoader;
 //
 
 //Creating all instances for the UI
 VPetLCD screen(&displayAdapter, &spriteManager, 40, 16);
 VPetLCDMenuBar32p menuBar(7,5,displayHeight);
 
-V20::DigimonWatchingScreen digimonScreen(&spriteManager, DIGIMON_AGUMON, -8, 40, 0, 0);
-V20::DigimonNameScreen digiNameScreen(&spriteManager, "Agumon", DIGIMON_AGUMON, 24);
+V20::DigimonWatchingScreen digimonScreen(&spriteManager, digimon.getDigimonIndex(), -8, 40, 0, 0);
+V20::DigimonNameScreen digiNameScreen(&spriteManager, dataLoader.getDigimonProperties(digiIndex)->digiName, digimon.getDigimonIndex(), 24);
 V20::AgeWeightScreen ageWeightScreen(5, 21);
 V20::HeartsScreen hungryScreen("Hungry", 2, 4);
 V20::HeartsScreen strengthScreen("Strength", 3, 4);
@@ -74,7 +85,7 @@ V20::PercentageScreen tPercentageScreen("WIN", 'T', 93);
 V20::SelectionScreen foodSelection(true);
 V20::SelectionScreen fightSelection(true);
 V20::ClockScreen clockScreen(true);
-V20::EatingAnimationScreen eatingAnimationScreen(&spriteManager, DIGIMON_AGUMON);
+V20::EatingAnimationScreen eatingAnimationScreen(&spriteManager, digimon.getDigimonIndex());
 
 //13 screens and 3 signals (one for each button)
 uint8_t numberOfScreens = 13;
@@ -105,6 +116,10 @@ uint8_t eatingAnimationScreenId = stateMachine.addScreen(&eatingAnimationScreen)
 uint8_t poop=0;
 
 void stateMachineInit() {
+  const DigimonProperties *properties = dataLoader.getDigimonProperties(digimon.getDigimonIndex());
+  digimon.setProperties(properties);
+  digimon.printSerial();
+
 
   //return to food selection screen after showing eating animation
   eatingAnimationScreen.setAnimationEndAction([]() {
@@ -147,8 +162,19 @@ void stateMachineInit() {
   //Here are the conditional transitions handled.
   stateMachine.addTransition(digimonScreenId, digimonScreenId, confirmSignal);
   stateMachine.addTransitionAction(digimonScreenId, confirmSignal, []() {
+    uint8_t maxdp = digimon.getProperties()->maxDigimonPower;
     switch (menuBar.getSelection()) {
     case 0:
+      digiNameScreen.setDigimonSpriteIndex(digimon.getDigimonIndex());
+      hungryScreen.setHearts(4-4*digimon.getHunger()/10);
+      
+      if(maxdp >0){
+        dpScreen.setFillPercentage((digimon.getDigimonPower()*100)/maxdp);
+      }else{
+        dpScreen.setFillPercentage(0);
+      }
+      ageWeightScreen.setAge(digimon.getAge());
+      ageWeightScreen.setWeight(digimon.getWeight());
       stateMachine.setCurrentScreen(digiNameScreenId);
       break;
     case 1:
@@ -161,7 +187,9 @@ void stateMachineInit() {
       break;
 
     case 4:
+      
       digimonScreen.flushPoop();
+      digimon.setNumberOfPoops(0);
       break;
 
     case 2:
@@ -185,11 +213,16 @@ void stateMachineInit() {
     uint8_t selection = foodSelection.getSelection();
     switch (selection) {
     case 0:
+      digimon.addWeight(1);
+      digimon.reduceHunger(1);
       eatingAnimationScreen.setSprites(SYMBOL_MEAT, SYMBOL_HALF_MEAT,SYMBOL_EMPTY_MEAT);
       eatingAnimationScreen.startAnimation();
       stateMachine.setCurrentScreen(eatingAnimationScreenId);
       break;
     case 1:
+      digimon.addWeight(2);
+      digimon.addStrength(2);
+      digimon.addDigimonPower(2);
       eatingAnimationScreen.setSprites(SYMBOL_PILL, SYMBOL_HALF_PILL,SYMBOL_EMPTY);
       eatingAnimationScreen.startAnimation();
       stateMachine.setCurrentScreen(eatingAnimationScreenId);
@@ -304,6 +337,34 @@ void setup(void)
   digitalWrite(ADC_EN, HIGH);
 
   randomSeed(analogRead(1));
+  savegame.init();
+  /*
+  digimon.setDigimonIndex(10);
+    digimon.setState(20);
+    digimon.setAge(30);
+    digimon.setWeight(40);
+    digimon.setFeedCounter(50);
+    digimon.setCareMistakes(60);
+    digimon.setTrainingCounter(70);
+    digimon.setTimeUntilEvolution(80);
+    digimon.setPoopTimer(90);
+    digimon.setAgeTimer(100);
+    digimon.setEvolutionTimer(110);
+    Serial.println(digimon.getDigimonIndex());
+  Serial.println(digimon.getState());
+  Serial.println(digimon.getAge());
+  Serial.println(digimon.getWeight());
+  Serial.println(digimon.getFeedCounter());
+  Serial.println(digimon.getCareMistakes());
+  Serial.println(digimon.getTrainingCounter());
+  Serial.println(digimon.getTimeUntilEvolution());
+  Serial.println(digimon.getPoopTimer());
+  Serial.println(digimon.getAgeTimer());
+  Serial.println(digimon.getEvolutionTimer());
+  savegame.saveDigimon(&digimon);
+  */
+
+ //savegame.loadDigimon(&digimon);
 
   //Some tft initialization stuff
   tft.init();
@@ -321,13 +382,17 @@ unsigned long ticker = 0;
 unsigned long tickerResetValue = 1000;
 unsigned long lastDelta = 0;
 float getFragmentation() ;
-boolean debug=true;
+boolean debug=false;
 
 void loop()
 {
 
   //tft.fillScreen(0x86CE);
   unsigned long t1 = millis();
+
+
+  digimon.loop(lastDelta);
+  digimonScreen.setNumberOfPoop(digimon.getNumberOfPoops());
 
 
   //updating the screens which need the loop

@@ -34,7 +34,8 @@ namespace V20{
       uint8_t currentWalkSprite;
 
       //Poop drawing stuff
-      uint8_t numberOfPoop; //theAmount of poop on the screen
+      uint8_t numberOfPoop; //theAmount of poop on the screen; This will be set to 0 before/right after flushpoop(); is called 
+      uint8_t numberOfPoopWhileFlushing; //theAmount of poop on the screen While Flushing Needed because read above
       uint8_t poopWidth = SPRITES_SYMBOL_RESOLUTION; //the width of poop in pixel
       uint8_t poopAnimationCounter;
       uint8_t poopOffsetY=0; // the offset when flushing
@@ -51,7 +52,7 @@ namespace V20{
       void drawSleeping(VPetLCD *lcd, boolean inBed);
 
     public:
-      DigimonWatchingScreen(AbstractSpriteManager* _spriteManager,uint8_t digimonSpritesIndex, int8_t _minX, int8_t _maxX,int8_t _minY, int8_t _maxY);
+      DigimonWatchingScreen(AbstractSpriteManager* _spriteManager,uint8_t _digimonSpritesIndex, int8_t _minX, int8_t _maxX,int8_t _minY, int8_t _maxY);
       void draw(VPetLCD *lcd);
       void loop(long delta); 
       void setXLimitations(int8_t _minX, int8_t _maxX){minX = _minX; maxX = _maxX;};
