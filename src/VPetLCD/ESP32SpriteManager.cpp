@@ -12,9 +12,13 @@ const byte* ESP32SpriteManager::getSmallDigitsSprite(uint8_t index){
 const byte* ESP32SpriteManager::getDigitSprite(uint8_t digit){
     return DIGITS[digit];
 }
+const byte space[8] ={0,0,0,0,0,0,0,0};
 
 const byte* ESP32SpriteManager::getSmallCapitalLetter(char c){
-
+  
+  if(c==' '){
+    return space;
+  }
   //make character uppercase if its not
   if (c > 'Z') {
     c -= 32;
@@ -27,6 +31,9 @@ const byte* ESP32SpriteManager::getSmallCapitalLetter(char c){
 
 
 const uint8_t ESP32SpriteManager::getSmallCapitalLetterWidth(char c){
+   if(c==' '){
+    return 1;
+  }
     if (c > 'Z') {
     c -= 32;
   }

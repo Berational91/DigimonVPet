@@ -156,6 +156,7 @@ void V20::DigimonWatchingScreen::flushPoop(){
  * Draws the digimon Walking
  * */
 void V20::DigimonWatchingScreen::drawWakedUp(VPetLCD* lcd) {
+  
   const unsigned short* sprite = spriteManager->getDigimonSprite(digimonSpritesIndex, currentWalkSprite);
   lcd->draw16BitArray(sprite, screenX + digimonX, screenY + digimonY, !looksLeft, pixelColor);
 }

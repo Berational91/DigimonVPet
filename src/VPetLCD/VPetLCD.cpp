@@ -143,7 +143,7 @@ void VPetLCD::drawScaledGrid(uint16_t resolutionX, uint16_t resolutionY) {
  *
  */
 void VPetLCD::draw16BitArray(const uint16_t toDraw[], int16_t onLcdX, int16_t onLcdY, boolean mirror, uint16_t color) {
-
+  
   int spriteWidth = SPRITES_DIGIMON_RESOLUTION;
   int spriteHeight = SPRITES_DIGIMON_RESOLUTION;
 
@@ -199,6 +199,7 @@ void VPetLCD::drawPixelOnLCD(int16_t onLcdX, int16_t onLcdY, uint16_t color) {
   if (onLcdX < 0 || onLcdY < 0 || onLcdX >= lcdWidth || onLcdY >= lcdHeight) {
     return;
   }
+
   canvas->fillRect(lcdX + onLcdX * lcdScale, lcdY + onLcdY * lcdScale, lcdScale, lcdScale, color);
 }
 
@@ -441,16 +442,20 @@ VPetLCD::VPetLCD(AbstractDisplayAdapter* displayAdapter, AbstractSpriteManager* 
   this->lcdX = 0;
   this->lcdY = 0;
 
-  this->lcdScale = 6;
+  this->lcdScale = 1;
 
   canvas->createCanvas();
   canvas->setColorDepth(16);
+
 }
 
 
 void VPetLCD::setMenuBar(VPetLCDMenuBar32p* _menuBar) {
   menuBar = _menuBar;
-  this->lcdY = menuBar->getBarHeight();
+  if(menuBar !=NULL)
+    this->lcdY = menuBar->getBarHeight();
+  else
+    this->lcdY = 0;
 };
 
 

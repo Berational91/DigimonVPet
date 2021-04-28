@@ -11,8 +11,8 @@ namespace V20{
   class ProgressBarScreen : public VPetLCD::Screen{
     private:
       char* text;
-      uint16_t barLength;
-      uint16_t fillPercentage;
+      uint16_t barLength=0;
+      uint16_t fillPercentage=0;
 
     public:
       ProgressBarScreen(char _text[], uint16_t _barLength, uint16_t _fillPercentage);

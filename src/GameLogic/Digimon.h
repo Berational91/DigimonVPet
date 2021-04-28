@@ -109,18 +109,18 @@ class Digimon{
         uint8_t state=0; //alive, sleep, dying, egg_state, super_dead, question_egg, dead, inbed/actually sleep
         uint16_t age=0;
         uint16_t weight=0;
-        uint16_t feedCounter;
-        uint16_t careMistakes;
-        uint16_t trainingCounter;
-        uint8_t numberOfPoops;
+        uint16_t feedCounter=0;
+        uint16_t careMistakes=0;
+        uint16_t trainingCounter=0;
+        uint8_t numberOfPoops=0;
         uint8_t hunger=10;
-        uint8_t strength;
-        uint8_t effort;
-        uint8_t digimonPower; //dp
+        uint8_t strength=0;
+        uint8_t effort=0;
+        uint8_t digimonPower=0; //dp
 
-        uint8_t sicknessCounter;
-        boolean isSick;
-        uint8_t numberOfTrainingSessions;
+        uint8_t sicknessCounter=0;
+        boolean isSick=false;
+        uint8_t numberOfTrainingSessions=0;
         //uint16_t singleTotalBattleRecord
         //uint16_t tagTotalBattleRecord
         //uint16_t singleTotalBattleWins
@@ -129,9 +129,9 @@ class Digimon{
         
 
         //timers
-        unsigned long poopTimer;
-        unsigned long ageTimer;
-        unsigned long evolutionTimer;
+        unsigned long poopTimer=0;
+        unsigned long ageTimer=0;
+        unsigned long evolutionTimer=0;
 
         void updateTimers(unsigned long delta);
 

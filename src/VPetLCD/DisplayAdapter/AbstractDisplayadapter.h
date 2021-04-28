@@ -36,5 +36,9 @@ public:
     //deletes the current canvas in order to free space.
     virtual void deleteCanvas();
 
+    uint16_t getWidthInPixel(){return canvasWidth;};
+    uint16_t getHeightInPixel(){return canvasHeight;};
+    
+
 
 };

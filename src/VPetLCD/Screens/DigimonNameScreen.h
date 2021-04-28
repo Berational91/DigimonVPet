@@ -13,9 +13,9 @@ namespace V20 {
   private:
     AbstractSpriteManager* spriteManager;
     char* digimonName;
-    uint16_t scrollBoxWidth;
-    int scrollOffsetX;
-    uint16_t textwidth;
+    uint16_t scrollBoxWidth=0;
+    int scrollOffsetX=0;
+    uint16_t textwidth=0;
     uint16_t digimonSpriteIndex;
 
 
@@ -25,12 +25,12 @@ namespace V20 {
     
 
   public:
-  void scrollText();  
+    void scrollText();  
     void loop(unsigned long delta);
     DigimonNameScreen(AbstractSpriteManager* _spriteManager, char _digimonName[], uint16_t _digimonSpriteIndex, uint16_t _scrollBoxWidth);
     void draw(VPetLCD* lcd);
     void setDigimonSpriteIndex(uint16_t _digimonSpriteIndex) { digimonSpriteIndex = _digimonSpriteIndex; };
-
+    void setDigimonName(char* _digimonName){digimonName=_digimonName;};
 
   };
 }

@@ -1,22 +1,66 @@
 #include "SaveGameHandler.h"
 
 void SaveGameHandler::loadDigimon(Digimon* digimon) {
-    digimon->setDigimonIndex(EEPROM.readUShort(ADRESS_DIGIMONINDEX));
-    digimon->setState(EEPROM.readByte(ADDRESS_STATE));
-    digimon->setAge(EEPROM.readUShort(ADDRESS_AGE));
-    digimon->setWeight(EEPROM.readUShort(ADDRESS_WEIGHT));
-    digimon->setFeedCounter(EEPROM.readUShort(ADDRESS_FEEDCOUNTER));
-    digimon->setCareMistakes(EEPROM.readUShort(ADDRESS_CAREMISTAKES));
-    digimon->setTrainingCounter(EEPROM.readUShort(ADDRESS_TRAININGCOUNTER));
-    digimon->setPoopTimer(EEPROM.readULong(ADDRESS_POOPTIMER));
-    digimon->setAgeTimer(EEPROM.readULong(ADDRESS_AGETIMER));
-    digimon->setEvolutionTimer(EEPROM.readULong(ADDRESS_EVOLUTIONETIMER));
+    uint16_t digiIndex =0;
+    EEPROM.get(ADRESS_DIGIMONINDEX, digiIndex);
+    digimon->setDigimonIndex(digiIndex);
 
-    digimon->setNumberOfPoops(EEPROM.readByte(ADDRESS_NUMBEROFPOOPS));
-    digimon->setHunger(EEPROM.readByte(ADDRESS_HUNGER));
-    digimon->setStrength(EEPROM.readByte(ADDRESS_STRENGTH));
-    digimon->setEffort(EEPROM.readByte(ADDRESS_EFFORT));
-    digimon->setDigimonPower(EEPROM.readByte(ADDRESS_DIGIMONPOWER));
+    uint8_t state =0;
+    EEPROM.get(ADDRESS_STATE, state);    
+    digimon->setState(state);
+
+    uint16_t age =0;
+    EEPROM.get(ADDRESS_AGE, age);
+    digimon->setAge(age);
+
+    uint16_t weight =0;
+    EEPROM.get(ADDRESS_WEIGHT, weight);
+    digimon->setWeight(weight);
+
+    uint16_t feedcounter =0;
+    EEPROM.get(ADDRESS_FEEDCOUNTER, feedcounter);
+    digimon->setFeedCounter(feedcounter);
+
+    uint16_t careMistakes =0;
+    EEPROM.get(ADDRESS_CAREMISTAKES, careMistakes);
+    digimon->setCareMistakes(careMistakes);
+
+    uint16_t tCounter =0;
+    EEPROM.get(ADDRESS_TRAININGCOUNTER, tCounter);
+    digimon->setTrainingCounter(tCounter);
+
+    unsigned long poopTimer =0;
+    EEPROM.get(ADDRESS_POOPTIMER, poopTimer);
+    digimon->setPoopTimer(poopTimer);
+
+    unsigned long ageTimer =0;
+    EEPROM.get(ADDRESS_AGETIMER, ageTimer);
+    digimon->setAgeTimer(ageTimer);
+
+    unsigned long evolutionTimer =0;
+    EEPROM.get(ADDRESS_EVOLUTIONETIMER, evolutionTimer);
+    digimon->setEvolutionTimer(evolutionTimer);
+
+
+    byte numPoops =0;
+    EEPROM.get(ADDRESS_NUMBEROFPOOPS, numPoops);
+    digimon->setNumberOfPoops(numPoops);
+
+    byte hunger =0;
+    EEPROM.get(ADDRESS_HUNGER, hunger);
+    digimon->setHunger(hunger);
+    
+    byte strength =0;
+    EEPROM.get(ADDRESS_STRENGTH, strength);
+    digimon->setStrength(strength);
+
+    byte effort =0;
+    EEPROM.get(ADDRESS_EFFORT, effort);
+    digimon->setEffort(effort);
+
+    byte dPower =0;
+    EEPROM.get(ADDRESS_DIGIMONPOWER, dPower);
+    digimon->setDigimonPower(dPower);
 }
 
 void SaveGameHandler::saveDigimon(Digimon* digimon) {

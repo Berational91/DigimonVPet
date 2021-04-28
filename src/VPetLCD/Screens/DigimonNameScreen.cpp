@@ -19,16 +19,18 @@ V20::DigimonNameScreen::DigimonNameScreen(AbstractSpriteManager* _spriteManager,
   //initializing it with 20 because, if it's zero before displaying the first time
   //the text will be out of box at the first displaying
   textwidth = 20;
+  updateIntervallTime = 125;
 }
 
 
 void V20::DigimonNameScreen::calculateTextWidth(VPetLCD* lcd) {
   textwidth = 0;
   int letters = strlen(digimonName);
+  
   for (int i = 0; i < letters; i++) {
     char c = digimonName[i];
 
-    textwidth += spriteManager->getSmallCapitalLetterWidth(c);
+    textwidth += spriteManager->getSmallCapitalLetterWidth(c)+1;
   }
 }
 
@@ -40,6 +42,7 @@ void V20::DigimonNameScreen::draw(VPetLCD* lcd) {
   
   lcd->draw16BitArray(sprite, screenX, screenY, false, pixelColor);
   drawScrollBoxOnLCD(lcd, digimonName, scrollBoxWidth, scrollOffsetX, screenX + SPRITES_DIGIMON_RESOLUTION, screenY + 8, pixelColor);
+
 }
 
 

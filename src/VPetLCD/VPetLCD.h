@@ -30,8 +30,8 @@ class VPetLCD {
 
     uint16_t lcdWidth;
     uint16_t lcdHeight;
-    uint16_t lcdX;
-    uint16_t lcdY;
+    uint16_t lcdX=0;
+    uint16_t lcdY=0;
     uint16_t lcdScale;
 
     uint16_t transparencyColor = 0;
@@ -73,10 +73,13 @@ class VPetLCD {
     VPetLCD(AbstractDisplayAdapter *displayAdapter, AbstractSpriteManager* _spriteManager, int lcdWidth, int lcdHeight);
 
     //sets the Position of the virtual LCD on the screen
-    void setLCDPos(int x, int y){lcdX=x;lcdY=y; }
+    void setLCDPos(int x, int y){lcdX=x;lcdY=y; };
+    void setLCDPosX(int x){lcdX=x; };
+    void setLCDPosY(int y){lcdY=y; };
 
     //sets the Position of the virtual LCD on the screen
     void setLcdScale(int scale){lcdScale=scale; };
+    uint8_t getLcdScale(){return lcdScale;};
 
   // Abstract class for Screens. Every Screen must be an underclass of screen.
   // after implementing the draw(...) method, one can it with the renderScreen(...) Method
@@ -108,7 +111,7 @@ class VPetLCD {
     }
 
     void setMenuBar(VPetLCDMenuBar32p* _menuBar);
-
+    void setLcdDimensions(uint8_t resolutionX,uint8_t resolutionY ){lcdWidth=resolutionX; lcdHeight=resolutionY;};
 
 
 };

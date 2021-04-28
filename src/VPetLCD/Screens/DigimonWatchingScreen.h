@@ -14,30 +14,30 @@ namespace V20{
     private:
       AbstractSpriteManager* spriteManager;
 
-      uint8_t digimonSpritesIndex;
-      int8_t digimonX;
-      int8_t digimonY;
+      uint8_t digimonSpritesIndex=0;
+      int8_t digimonX=0;
+      int8_t digimonY=0;
       boolean looksLeft;
       boolean looksUp;
 
     //those are the limits of the digimons movement
-      int8_t maxX;
-      int8_t minX;
-      int8_t maxY;
-      int8_t minY;
+      int8_t maxX=0;
+      int8_t minX=0;
+      int8_t maxY=0;
+      int8_t minY=0;
 
-      uint8_t probabilityChangeDirection;
-      uint8_t probabilityMoveVertical;
-      uint8_t probabilityMakeAnotherMove;
-      uint8_t probabilityChangeWalkingSprite;
+      uint8_t probabilityChangeDirection=0;
+      uint8_t probabilityMoveVertical=0;
+      uint8_t probabilityMakeAnotherMove=0;
+      uint8_t probabilityChangeWalkingSprite=0;
       
-      uint8_t currentWalkSprite;
+      uint8_t currentWalkSprite=0;
 
       //Poop drawing stuff
-      uint8_t numberOfPoop; //theAmount of poop on the screen; This will be set to 0 before/right after flushpoop(); is called 
-      uint8_t numberOfPoopWhileFlushing; //theAmount of poop on the screen While Flushing Needed because read above
+      uint8_t numberOfPoop=0; //theAmount of poop on the screen; This will be set to 0 before/right after flushpoop(); is called 
+      uint8_t numberOfPoopWhileFlushing=0; //theAmount of poop on the screen While Flushing Needed because read above
       uint8_t poopWidth = SPRITES_SYMBOL_RESOLUTION; //the width of poop in pixel
-      uint8_t poopAnimationCounter;
+      uint8_t poopAnimationCounter=0;
       uint8_t poopOffsetY=0; // the offset when flushing
       boolean isFlushing=false;
       void drawPoop(VPetLCD* lcd);
