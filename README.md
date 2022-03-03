@@ -1,15 +1,15 @@
 # Digimon V-Pet for ESP32/Arduino
-This is an early version of a Digimon VPet for the ESP32 and other Arduino compatible devices
+This is a fork af the early version of a Digimon VPet for the ESP32 and other Arduino compatible devices made by [Berational91](https://github.com/Berational91)
 At the moment there are just [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI/) compatible Displays supported. But you can make your own Display working by just implementing an realization of the abstract DisplayAdapter Class with just 8 Methods.
 The Goal of this project is to implement a Digimon VPet with all the functionality of real VPets and compatibility to real Digimon VPets.
 
 <img src="screenshot.jpg" width="500" >
-At the moment there is just the UI implemented but no functionality. But the Long Term goals are:
+At the moment there is just the UI implemented but little functionality. But the Long Term goals are:
 
 Hardware independence:
-- the ardware should be highly customizable, so you can use different displays, different inputs etc. 
+- the hardware should be highly customizable, so you can use different displays, different inputs etc. 
 
-Functionality:
+Berational91 future wanted functionality:
 - Internet connectivity through WiFi
 - [A-/D-Com](https://www.alphahub.site/guide) functionality 
 - it should have a function to act as a gate, to allow 2 people to fight/jogress/... with their original VPETs through the internet

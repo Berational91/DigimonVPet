@@ -27,7 +27,8 @@
 
 
 SaveGameHandler savegame;
-uint16_t digiIndex =DIGIMON_BOTAMON;
+//uint16_t digiIndex =DIGIMON_BOTAMON;
+uint16_t digiIndex =DIGIMON_AGUMON;
 Digimon digimon(digiIndex);
 
 //ESP32 Specific stuff
