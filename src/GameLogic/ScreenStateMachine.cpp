@@ -74,7 +74,9 @@ uint8_t ScreenStateMachine::addScreen(VPetLCD::Screen* screen) {
 boolean ScreenStateMachine::addTransition(uint8_t screenId1, uint8_t screenId2, uint8_t signalId) {
     if (screenId1 <= screenCounter && screenId2 <= screenCounter && screenId1 > 0 && screenId2 > 0 && signalId < numberOfSignals) {
         transitions[getIndex(screenId1)][signalId] = screenId2;
+        return true;
     }
+    return false;
 }
 
 
@@ -136,6 +138,7 @@ boolean ScreenStateMachine::sendSignal(uint8_t signalId) {
         if( transitionActions[getIndex(oldCurrentScreenId)][signalId] != NULL){
             transitionActions[getIndex(oldCurrentScreenId)][signalId]();
         }
+        return true;
     }    
 else {
         return false;

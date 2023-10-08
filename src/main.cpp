@@ -23,10 +23,8 @@
 #include "GameLogic/ScreenStateMachine.h"
 
 #include "GameLogic/Digimon.h"
-#include "SaveGame/SaveGameHandler.h"
 
 
-SaveGameHandler savegame;
 uint16_t digiIndex =DIGIMON_BOTAMON;
 Digimon digimon(digiIndex);
 
@@ -118,7 +116,6 @@ uint8_t poop=0;
 void stateMachineInit() {
   const DigimonProperties *properties = dataLoader.getDigimonProperties(digimon.getDigimonIndex());
   digimon.setProperties(properties);
-  digimon.printSerial();
 
 
   //return to food selection screen after showing eating animation
@@ -147,7 +144,6 @@ void stateMachineInit() {
   //Transitions between clock screen and digimon watching screen
   stateMachine.addTransition(digimonScreenId, clockScreenId, backSignal);
   stateMachine.addTransition(clockScreenId, digimonScreenId, backSignal);
-
 
   //Conditional transtitions from digimonScreen to the others (menuselection)
   //this must be set, because unset transitions wont trigger transitionActions
@@ -335,7 +331,6 @@ void setup(void)
   digitalWrite(ADC_EN, HIGH);
 
   randomSeed(analogRead(1));
-  savegame.init();
   /*
   digimon.setDigimonIndex(10);
     digimon.setState(20);
@@ -370,9 +365,14 @@ void setup(void)
   tft.fillScreen(0x86CE);
 
 //init functions
+Serial.println("button_init");
   button_init();
+  Serial.println("setupScreens");
   setupScreens();
+  
   stateMachineInit();
+  Serial.println("stateMachineInit");
+
 }
 // =========================================================================
 
@@ -384,7 +384,6 @@ boolean debug=false;
 
 void loop()
 {
-
   //tft.fillScreen(0x86CE);
   unsigned long t1 = millis();
 
