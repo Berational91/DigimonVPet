@@ -25,6 +25,7 @@ boolean V20::AnimationScreen::addFrame(std::function<void(VPetLCD* lcd, Animatio
     if (numberOfFrames < numberOfFramesMax) {
         frames[numberOfFrames] = frame;
         numberOfFrames++;
+        return true;
     } else {
         return false;
     }
